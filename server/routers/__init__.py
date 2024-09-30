@@ -1,2 +1,2 @@
-from . import logs
-from . import telegram
+from .telegram import router as telegram
+from .logs import router as logs

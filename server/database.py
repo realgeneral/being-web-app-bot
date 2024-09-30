@@ -1,9 +1,13 @@
 import os
+import logging
 
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from dotenv import load_dotenv
+
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()  # Загрузка переменных окружения из .env файла
 
@@ -34,7 +38,7 @@ async def get_session() -> AsyncSession:
         try:
             yield session
         except SQLAlchemyError as e:
-            print(f"Database error: {e}")
+            logging.error(f"Database error: {e}")
             await session.rollback()
             raise
         finally:

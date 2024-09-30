@@ -11,7 +11,7 @@ import { TonConnectUIProvider } from '@tonconnect/ui-react';
 
 
 // Base URL for API requests
-const API_BASE_URL = 'https://eb38-89-248-191-104.ngrok-free.app';
+const API_BASE_URL = 'https://6918-89-248-191-104.ngrok-free.app';
 // Function to send logs to the server
 const sendLogToServer = (message: string) => {
   axios

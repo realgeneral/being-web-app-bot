@@ -1,4 +1,6 @@
-from pydantic import BaseModel, Field
+# server/schemas/user.py
+
+from pydantic import BaseModel
 from typing import Optional
 
 class UserBase(BaseModel):
@@ -31,6 +33,20 @@ class UserInDB(UserBase):
     id: int
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+class UserResponse(BaseModel):
+    id: int
+    telegram_id: int
+    username: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    points: int
+    referral_code: Optional[str] = None
+    is_premium: bool
+    language_code: Optional[str]
 
     class Config:
         orm_mode = True

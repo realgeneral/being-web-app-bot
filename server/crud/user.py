@@ -1,14 +1,13 @@
-# app/crud/user.py
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
-from ..models.user import User
-from ..schemas.user import UserCreate, UserUpdate
+from server.models import User
+from server.schemas.user import UserCreate, UserUpdate
 
-async def get_user(db: AsyncSession, user_id: int):
+async def get_user_by_telegram_id(db: AsyncSession, telegram_id: int):
     try:
-        result = await db.execute(select(User).filter(User.id == user_id))
+        result = await db.execute(select(User).filter(User.telegram_id == telegram_id))
         return result.scalars().first()
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=str(e))
