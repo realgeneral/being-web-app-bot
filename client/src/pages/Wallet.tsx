@@ -28,6 +28,8 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
   const [referrals, setReferrals] = useState<Referral[]>(user.referrals || []);
   const referralCount = referrals.length;
 
+  const referralLink = `${window.location.origin}/referral/${user.username}`;
+
   useEffect(() => {
     if (walletAddress) {
       // Отправляем адрес кошелька на сервер
@@ -44,6 +46,17 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
         });
     }
   }, [walletAddress, user.id]);
+
+  // Функция для копирования реферальной ссылки
+  const handleCopyReferralLink = () => {
+    navigator.clipboard.writeText(referralLink)
+      .then(() => {
+        alert('Реферальная ссылка скопирована!');
+      })
+      .catch(err => {
+        console.error('Ошибка при копировании ссылки:', err);
+      });
+  };
 
   // Функция для обработки пополнения баланса
   const handleAddFunds = () => {
@@ -83,6 +96,15 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
         <p className="text-lg font-semibold">
           Invite your friends and get 7% of their income
         </p>
+        {/* Кнопка копирования реферальной ссылки */}
+        <div className="mt-4">
+          <button
+            onClick={handleCopyReferralLink}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+          >
+            Скопировать реферальную ссылку
+          </button>
+        </div>
       </div>
 
       {/* Рефералы */}

@@ -11,7 +11,7 @@ import { TonConnectUIProvider } from '@tonconnect/ui-react';
 
 
 // Base URL for API requests
-const API_BASE_URL = 'https://6918-89-248-191-104.ngrok-free.app';
+const API_BASE_URL = 'https://0f24-89-248-191-104.ngrok-free.app';
 // Function to send logs to the server
 const sendLogToServer = (message: string) => {
   axios
@@ -44,8 +44,9 @@ const App: React.FC = () => {
 
           if (initData) {
             const response = await axios.post(`${API_BASE_URL}/api/auth/telegram`, { initData });
+            console.log('Authentication response:', response.data);
             if (isMounted) {
-              setUser(response.data.user);
+              setUser(response.data);
               sendLog('User authenticated successfully.');
             }
           } else {
@@ -58,6 +59,7 @@ const App: React.FC = () => {
         sendLog('Telegram auth failed: ' + error.message);
       } finally {
         if (isMounted) {
+          
           // Добавляем искусственную задержку перед снятием состояния загрузки
           setTimeout(() => {
             setLoading(false); // Снимаем состояние загрузки после задержки

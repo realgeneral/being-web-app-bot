@@ -6,16 +6,3 @@ declare global {
     Telegram: any;
   }
 }
-
-declare namespace Telegram {
-  interface WebApp {
-
-    requestWalletAccess: () => Promise<{
-      wallet: {
-        address: string;
-        network: string;
-        publicKey: string;
-      };
-    }>;
-  }
-}
