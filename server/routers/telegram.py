@@ -10,7 +10,7 @@ import os
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from server.database import get_session
-from server.crud import user as crud_user
+from server.crud import get_user_by_telegram_id, create_user
 from server.schemas.user import UserCreate, UserResponse
 
 router = APIRouter()
@@ -64,11 +64,11 @@ async def telegram_auth(
             raise HTTPException(status_code=400, detail="Telegram ID is missing")
 
         # Проверяем, существует ли пользователь в базе данных
-        existing_user = await crud_user.get_user_by_telegram_id(db, telegram_id)
+        existing_user = await get_user_by_telegram_id(db, telegram_id)
 
         if existing_user:
-            # Пользователь уже существует, возвращаем его данные
             return existing_user
+            logger.error(f"SUCESS ")
         else:
             # Создаем нового пользователя
             new_user = UserCreate(
@@ -80,7 +80,7 @@ async def telegram_auth(
                 language_code=user_data.get('language_code', 'en'),
                 # Добавьте дополнительные поля при необходимости
             )
-            created_user = await crud_user.create_user(db, new_user)
+            created_user = await create_user(db, new_user)
             return created_user
 
 

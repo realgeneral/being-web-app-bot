@@ -1,17 +1,18 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, TIMESTAMP, text, BigInteger
-from sqlalchemy.orm import relationship
+# server/models/user.py
 
+from sqlalchemy import Column, BigInteger, String, Boolean, ForeignKey, TIMESTAMP, text
+from sqlalchemy.orm import relationship
 from .base import Base
 
 class User(Base):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(BigInteger, primary_key=True, index=True)
     telegram_id = Column(BigInteger, unique=True, nullable=False)
     username = Column(String(255))
     first_name = Column(String(255))
     last_name = Column(String(255))
-    points = Column(Integer, default=0)
+    points = Column(BigInteger, default=0)
     referral_id = Column(BigInteger, ForeignKey('users.id'))
     referral_code = Column(String(10), unique=True)
     is_premium = Column(Boolean, default=False)
@@ -28,6 +29,7 @@ class User(Base):
         server_default=text('CURRENT_TIMESTAMP'),
         server_onupdate=text('CURRENT_TIMESTAMP')
     )
+
     referrals = relationship("User", remote_side=[id])
     language = relationship("Language", back_populates="users")
     tasks = relationship("Task", back_populates="user")

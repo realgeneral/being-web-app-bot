@@ -7,13 +7,11 @@ class Task(Base):
     __tablename__ = 'tasks'
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(BigInteger, ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    user_id = Column(BigInteger, ForeignKey('users.telegram_id', ondelete="CASCADE"), nullable=False)
     task_type_id = Column(Integer, ForeignKey('task_types.id'), nullable=False)
     name = Column(String(255), nullable=False)
-    description = Column(Text)
+    description = Column(Text, default="")
     link = Column(String(255), nullable=False)
-    image_url = Column(String(255))
-    category = Column(String(50))
     total_clicks = Column(Integer, nullable=False)
     completed_clicks = Column(Integer, default=0)
     reward_points = Column(Integer, nullable=False)

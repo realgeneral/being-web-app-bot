@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.exc import SQLAlchemyError
@@ -19,8 +21,10 @@ async def create_user(db: AsyncSession, user: UserCreate):
         await db.commit()
         await db.refresh(new_user)
         return new_user
-    except SQLAlchemyError as e:
+    except Exception as e:
         await db.rollback()
+        logging.error(f"Database error {e}")
+
         raise HTTPException(status_code=500, detail=str(e))
 
 async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
