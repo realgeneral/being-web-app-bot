@@ -11,11 +11,15 @@ import { TonConnectUIProvider } from '@tonconnect/ui-react';
 
 
 // Base URL for API requests
-const API_BASE_URL = 'https://0f24-89-248-191-104.ngrok-free.app';
+const API_BASE_URL = 'https://c915-89-248-191-104.ngrok-free.app';
 // Function to send logs to the server
 const sendLogToServer = (message: string) => {
   axios
-    .post(`${API_BASE_URL}/api/logs`, { message })
+    .post(`${API_BASE_URL}/api/logs/`, { message }, {
+      headers: {
+        'ngrok-skip-browser-warning': 'true', // Добавляем заголовок
+      },
+    })
     .then((response) => {
       console.log('Log sent successfully:', response.data);
     })
@@ -43,7 +47,11 @@ const App: React.FC = () => {
           sendLog('Init data received: ' + initData); // Log once when received
 
           if (initData) {
-            const response = await axios.post(`${API_BASE_URL}/api/auth/telegram`, { initData });
+            const response = await axios.post(`${API_BASE_URL}/api/auth/telegram`, { initData }, {
+              headers: {
+                'ngrok-skip-browser-warning': 'true', // Добавляем заголовок
+              },
+            });
             console.log('Authentication response:', response.data);
             if (isMounted) {
               setUser(response.data);
@@ -92,7 +100,6 @@ const App: React.FC = () => {
   // Render the main application layout with user data
   return (
     <TonConnectUIProvider manifestUrl="https://your-domain.com/tonconnect-manifest.json">
-      {/* Ваше приложение */}
       <Router>
         <Layout user={user}>
           <Routes>

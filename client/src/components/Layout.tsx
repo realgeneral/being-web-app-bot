@@ -13,6 +13,10 @@ const Layout: React.FC<LayoutProps> = ({ children, user }) => {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 h-16 flex justify-between items-center px-4 bg-black z-10">
         <div className="text-2xl font-bold text-yellow-500">BEING BOT</div>
+        <div className="flex items-center bg-gray-800 p-3 rounded-md shadow-md space-x-2">
+          <span className="text-sm font-bold text-yellow-500">{user.points}</span>
+          <span className="text-sm text-gray-300">Points</span>
+        </div>
       </header>
 
       {/* Main Content */}
