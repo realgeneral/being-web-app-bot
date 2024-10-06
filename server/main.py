@@ -9,17 +9,16 @@ app = FastAPI()
 # CORS settings
 origins = [
     "http://localhost:5173",
-    "https://19a8-89-248-191-104.ngrok-free.app"
+    "https://52ed-89-248-191-104.ngrok-free.app"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Разрешить все источники (только для отладки)
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],  # Разрешить все заголовки
+    allow_headers=["*"],
 )
-
 # Подключение модульных роутеров
 app.include_router(logs, prefix="/api/logs", tags=["logs"])
 app.include_router(telegram, prefix="/api/auth", tags=["telegram"])

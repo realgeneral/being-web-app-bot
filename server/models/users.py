@@ -36,3 +36,4 @@ class User(Base):
     referrals_record = relationship("Referral", back_populates="referrer", foreign_keys="Referral.referrer_id")
     wallet_transactions = relationship("WalletTransaction", back_populates="user")
     logs = relationship("Log", back_populates="user")
+    task_clicks = relationship("TaskClick", back_populates="user", cascade="all, delete-orphan")  # Обратная связь с TaskClick
