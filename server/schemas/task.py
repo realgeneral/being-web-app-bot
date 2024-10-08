@@ -8,6 +8,7 @@ class TaskBase(BaseModel):
     link: str
     total_clicks: int
     reward_per_click: int
+    status_id: int
 
 class TaskCreate(TaskBase):
     pass
@@ -21,6 +22,7 @@ class TaskInDBBase(TaskBase):
     user_id: int
     completed_clicks: int
     reserved_points: int
+
     created_at: datetime
     updated_at: datetime
 

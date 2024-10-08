@@ -117,7 +117,7 @@ async def claim_task_in_db(db: AsyncSession, task_id: int, telegram_id: int):
         result_task = await db.execute(select(Task).where(Task.id == int(task_id)))
         task = result_task.scalar_one_or_none()
         
-        result_user = await db.execute(select(User).where(User.telegram_id == user_id))
+        result_user = await db.execute(select(User).where(User.telegram_id == telegram_id))
         user = result_user.scalar_one_or_none()
 
         if not user:

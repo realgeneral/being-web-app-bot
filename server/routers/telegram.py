@@ -82,8 +82,6 @@ async def telegram_auth(
             )
             created_user = await create_user(db, new_user)
             return created_user
-
-
     except Exception as e:
         logger.error(f"Error during Telegram authentication: {str(e)}")
         raise HTTPException(status_code=400, detail="Failed to authenticate Telegram data")
