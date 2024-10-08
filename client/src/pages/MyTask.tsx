@@ -20,7 +20,7 @@ interface Task {
   total_clicks: number;
   completed_clicks: number;
   reward_per_click: number;
-  status_id: number; // Add this line
+  status_id: number;
 }
 
 const MyTask: React.FC<MyTaskProps> = ({ user }) => {
@@ -32,8 +32,9 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
     link: '',
     total_clicks: 1,
     reward_per_click: 1,
+    status_id: 1, // Добавил поле status_id
   });
-  const [isArchivedView, setIsArchivedView] = useState<boolean>(false); // Добавляем состояние для переключения между активными и архивными задачами
+  const [isArchivedView, setIsArchivedView] = useState<boolean>(false);
 
   const API_BASE_URL = 'https://c915-89-248-191-104.ngrok-free.app';
 
@@ -51,7 +52,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
       );
       setTasks(response.data);
     } catch (error) {
-      console.error('Error fetching active tasks:', error);
+      console.error('Ошибка при получении активных задач:', error);
     }
   };
 
@@ -69,14 +70,14 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
       );
       setTasks(response.data);
     } catch (error) {
-      console.error('Error fetching archived tasks:', error);
+      console.error('Ошибка при получении архивных задач:', error);
     }
   };
 
   // Функция для завершения задачи
   const handleFinishTask = async (taskId: number) => {
     const isConfirmed = window.confirm(
-      'Are you sure you want to complete this task?'
+      'Вы уверены, что хотите завершить это задание?'
     );
     if (!isConfirmed) return;
 
@@ -90,16 +91,16 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
           },
         }
       );
-      console.log('Task finished successfully:', response.data);
+      console.log('Задание успешно завершено:', response.data);
       fetchActiveTasks(); // Обновляем список задач
     } catch (error) {
-      console.error('Error finishing task:', error);
+      console.error('Ошибка при завершении задания:', error);
     }
   };
 
-  // Загрузка активных задач при рендере компонента
+  // Загрузка активных или архивных задач при рендере компонента
   useEffect(() => {
-    // Clear tasks when view changes
+    // Очищаем задачи при изменении вида
     setTasks([]);
     if (!isArchivedView) {
       fetchActiveTasks(); // Загрузить активные задачи при загрузке страницы
@@ -112,9 +113,16 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]:
+        name === 'task_type_id' ||
+        name === 'total_clicks' ||
+        name === 'reward_per_click' ||
+        name === 'status_id'
+          ? parseInt(value)
+          : value,
     }));
   };
 
@@ -130,14 +138,14 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
           },
         }
       );
-      console.log('Task created:', response.data);
+      console.log('Задание создано:', response.data);
       setShowForm(false);
-      fetchActiveTasks(); // Обновляем список задач после создания новой
+      fetchActiveTasks(); // Обновляем список задач после создания нового
     } catch (error: any) {
-      console.error('Error creating task:', error);
+      console.error('Ошибка при создании задания:', error);
       alert(
-        'Error creating task: ' +
-          (error.response?.data?.detail || 'Unknown error')
+        'Ошибка при создании задания: ' +
+          (error.response?.data?.detail || 'Неизвестная ошибка')
       );
     }
   };
@@ -151,7 +159,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
       case 2:
         return { text: 'Completed', color: 'bg-green-500' };
       case 3:
-        return { text: 'Stopped', color: 'bg-red-500' };
+        return { text: 'Finished', color: 'bg-red-500' };
       default:
         return { text: '', color: '' };
     }
@@ -162,7 +170,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
       {/* Заголовок страницы */}
       <header className="flex-none h-10 w-full flex justify-between items-center px-4 bg-black border-b border-gray-700">
         <h1 className="text-2xl font-bold">
-          {isArchivedView ? 'Archived Tasks' : 'My Active Tasks'}
+          {isArchivedView ? 'My archive tasks' : 'My active tasks'}
         </h1>
       </header>
 
@@ -174,22 +182,127 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
               className="bg-gray-800 border border-white px-4 py-2 rounded hover:bg-yellow-500 transition"
               onClick={() => setShowForm(true)}
             >
-              Create New Task
+              Create new task
             </button>
           )}
           <button
             className="bg-gray-800 border border-white px-4 py-2 rounded hover:bg-yellow-500 transition"
             onClick={() => setIsArchivedView(!isArchivedView)} // Переключаем вид между архивными и активными задачами
           >
-            {isArchivedView ? 'View Active Tasks' : 'Archive Tasks'}
+            {isArchivedView ? 'My active tasks' : 'My archive tasks'}
           </button>
         </div>
 
         {/* Форма создания задания */}
         {showForm && !isArchivedView && (
-          <form onSubmit={handleSubmit} className="mt-6 w-full max-w-md">
-            {/* Form Fields */}
-            {/* ... (same as before) */}
+          <form
+            onSubmit={handleSubmit}
+            className="mt-6 w-full max-w-md bg-gray-800 p-5 rounded"
+          >
+            <div className="mb-4">
+              <label
+                className="block text-white text-sm font-bold mb-2"
+                htmlFor="task_type_id"
+              >
+                Type
+              </label>
+              <select
+                name="task_type_id"
+                id="task_type_id"
+                value={formData.task_type_id}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 text-white bg-black rounded"
+                required
+              >
+                <option value={1}>Bot</option>
+                <option value={2}>Chanel</option>
+              </select>
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-white text-sm font-bold mb-2"
+                htmlFor="name"
+              >
+                Task name
+              </label>
+              <input
+                type="text"
+                name="name"
+                id="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 text-white"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-white text-sm font-bold mb-2"
+                htmlFor="link"
+              >
+                Link (starting with https://t.me/...)
+              </label>
+              <input
+                type="text"
+                name="link"
+                id="link"
+                value={formData.link}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 text-white"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-white text-sm font-bold mb-2"
+                htmlFor="total_clicks"
+              >
+                Total clicks
+              </label>
+              <input
+                type="number"
+                name="total_clicks"
+                id="total_clicks"
+                value={formData.total_clicks}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 text-white"
+                min="1"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-white text-sm font-bold mb-2"
+                htmlFor="reward_per_click"
+              >
+                Points per click
+              </label>
+              <input
+                type="number"
+                name="reward_per_click"
+                id="reward_per_click"
+                value={formData.reward_per_click}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 text-white"
+                min="1"
+                required
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <button
+                type="submit"
+                className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded"
+              >
+                Create
+              </button>
+              <button
+                type="button"
+                className="text-white underline"
+                onClick={() => setShowForm(false)}
+              >
+                Cancel
+              </button>
+            </div>
           </form>
         )}
 
@@ -197,7 +310,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
         <div className="w-full max-w-4xl mt-6">
           {tasks.length === 0 ? (
             <p className="text-center text-white">
-              You don't have any {isArchivedView ? 'archived' : 'active'} tasks
+             You dont have any {isArchivedView ? 'archive' : 'actve'} tasks
             </p>
           ) : (
             <div className="space-y-4 px-5">
@@ -223,10 +336,10 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
                       </a>
                     </div>
 
-                    {/* Display status label for archived tasks */}
+                    {/* Отображение статуса задания для архивных задач */}
                     {isArchivedView && (
                       <div
-                        className={`ml-4 px-2 py-1 rounded text-white ${getStatusLabel(
+                        className={`ml-1 px-1 py-1 rounded text-white ${getStatusLabel(
                           task.status_id
                         ).color}`}
                       >
@@ -234,7 +347,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
                       </div>
                     )}
                   </div>
-                  <span className="text-2xl font-bold text-yellow-500">
+                  <span className="text-xl font-bold text-yellow-500">
                     {task.completed_clicks} / {task.total_clicks}
                   </span>
                   {!isArchivedView && (

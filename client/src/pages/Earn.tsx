@@ -185,6 +185,7 @@ const Earn: React.FC<EarnProps> = ({ user }) => {
       {/* Заголовок с именем пользователя и балансом */}
       <header className="flex-none h-10 w-full flex justify-between items-center px-6 bg-black border-b border-gray-700">
         <h1 className="text-2xl font-bold">EARN</h1>
+
       </header>
 
       {/* Вкладки */}
