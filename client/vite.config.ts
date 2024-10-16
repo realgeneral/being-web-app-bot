@@ -6,6 +6,7 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+
   server: {
     https: {
       key: fs.readFileSync(path.resolve('/etc/ssl/nollab.key')),  // Путь к SSL-ключу
