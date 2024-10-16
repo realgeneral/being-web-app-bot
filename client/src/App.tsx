@@ -99,7 +99,7 @@ const App: React.FC = () => {
 
   // Render the main application layout with user data
   return (
-    <TonConnectUIProvider manifestUrl="https://your-domain.com/tonconnect-manifest.json">
+    <TonConnectUIProvider manifestUrl="https://nollab.ru/tonconnect-manifest.json">
       <Router>
         <Layout user={user}>
           <Routes>
