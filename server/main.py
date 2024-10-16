@@ -1,5 +1,5 @@
 # app/main.py
-
+from fastapi.routing import APIRoute
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from server.routers import logs, telegram, task
@@ -24,11 +24,15 @@ app.add_middleware(
 app.include_router(logs, prefix="/api/logs", tags=["logs"])
 app.include_router(telegram, prefix="/api/auth", tags=["telegram"])
 app.include_router(task, prefix="/api/task", tags=["task"])
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+app.mount("/", StaticFiles(directory="server/static", html=True), name="static")
 
 for route in app.routes:
-    methods = ','.join(route.methods)
-    print(f"{route.path} [{methods}] -> {route.name}")
+    if isinstance(route, APIRoute):
+        methods = ','.join(route.methods)
+        print(f"Route: {route.path} | Methods: {methods}")
+    else:
+        # Обработка других типов маршрутов (например, Mount)
+        print(f"Route: {route.path} | Type: {type(route)}")
 
 # Example endpoint to verify the server is running
 @app.get("/api/hello")
