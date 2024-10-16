@@ -36,7 +36,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
   });
   const [isArchivedView, setIsArchivedView] = useState<boolean>(false);
 
-  const API_BASE_URL = 'https://c915-89-248-191-104.ngrok-free.app';
+  const API_BASE_URL = 'https://nollab.ru:8000';
 
   // Функция для загрузки активных задач пользователя
   const fetchActiveTasks = async () => {

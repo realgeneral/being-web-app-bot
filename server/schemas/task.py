@@ -27,7 +27,7 @@ class TaskInDBBase(TaskBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ClaimTaskRequest(BaseModel):
     task_id: int

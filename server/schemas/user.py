@@ -35,7 +35,7 @@ class UserInDB(UserBase):
     updated_at: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserResponse(BaseModel):
     id: int
@@ -49,4 +49,4 @@ class UserResponse(BaseModel):
     language_code: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True

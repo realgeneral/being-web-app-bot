@@ -3,7 +3,7 @@ import axios from 'axios';
 import { TonConnectButton, useTonConnectUI } from '@tonconnect/ui-react';
 
 // Замените на ваш базовый URL API
-const API_BASE_URL = 'https://your-api-base-url.com';
+const API_BASE_URL = 'https://nollab.ru:8000';
 
 interface Referral {
   username: string;
