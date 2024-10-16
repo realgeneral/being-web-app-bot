@@ -8,8 +8,8 @@ app = FastAPI()
 
 # CORS settings
 origins = [
-    "http://localhost:5173",
-    "https://52ed-89-248-191-104.ngrok-free.app"
+    "https://localhost:5173",
+    "https://nollab.ru:5173"
 ]
 
 app.add_middleware(
@@ -31,4 +31,4 @@ for route in app.routes:
 # Example endpoint to verify the server is running
 @app.get("/api/hello")
 async def say_hello():
-    return {"message": "Hello from FastAPI"}
+    return {"message": "Hello from Asya!"}

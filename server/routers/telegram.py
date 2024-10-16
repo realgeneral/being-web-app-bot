@@ -16,7 +16,7 @@ from server.schemas.user import UserCreate, UserResponse
 router = APIRouter()
 
 
-BOT_TOKEN = '7694592328:AAHKHS6air9NKLVhtaiS6u8vztnWxO0AZxM'
+BOT_TOKEN = '7379330461:AAFANy49VXwlHwhmZgt99_emw3YW1VZncIw'
 logger = logging.getLogger(__name__)
 
 class TelegramAuthData(BaseModel):
