@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { TonConnectButton, useTonConnectUI } from '@tonconnect/ui-react';
+import { TonConnectButton, useTonConnectUI, TonConnectUIProvider } from '@tonconnect/ui-react';
 
 // Замените на ваш базовый URL API
 const API_BASE_URL = 'https://nollab.ru:8000';
@@ -59,9 +59,29 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
   };
 
   // Функция для обработки пополнения баланса
-  const handleAddFunds = () => {
-    // Реализуйте логику пополнения баланса
-    // Например, откройте модальное окно или перенаправьте на страницу оплаты
+  const handleAddFunds = (amountTON: number) => {
+    if (!walletAddress) {
+      alert('Пожалуйста, подключите кошелек перед пополнением.');
+      return;
+    }
+
+    // Создаем транзакцию через TonConnect
+    tonConnectUI.sendTransaction({
+      validUntil: Date.now() + 5 * 60 * 1000, // Транзакция действительна 5 минут
+      messages: [
+        {
+          address: 'ВАШ_АДРЕС_КОШЕЛЬКА', // Замените на адрес вашего кошелька для приема платежей
+          amount: (amountTON * 1e9).toString(), // Переводим TON в нанотоны
+        },
+      ],
+    })
+    .then(() => {
+      alert('Транзакция успешно отправлена!');
+      // Здесь вы можете обновить баланс пользователя, отправив запрос на сервер
+    })
+    .catch((error) => {
+      console.error('Ошибка при отправке транзакции:', error);
+    });
   };
 
   return (
@@ -77,16 +97,33 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
         <div className="flex flex-col items-center space-y-4">
           {walletAddress ? (
             <>
-              <p className="text-sm text-green-400">Кошелек подключен</p>
-              <button
-                onClick={handleAddFunds}
-                className="bg-yellow-500 text-black px-6 py-3 rounded-md hover:bg-yellow-600 transition transform hover:scale-105 shadow-md"
-              >
-                Add Funds
-              </button>
+              <p className="text-sm text-green-400">Кошелек подключен: {walletAddress}</p>
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => handleAddFunds(3)}
+                  className="bg-yellow-500 text-black px-4 py-2 rounded-md hover:bg-yellow-600 transition transform hover:scale-105 shadow-md"
+                >
+                  Пополнить 300 поинтов (3 TON)
+                </button>
+                <button
+                  onClick={() => handleAddFunds(10)}
+                  className="bg-yellow-500 text-black px-4 py-2 rounded-md hover:bg-yellow-600 transition transform hover:scale-105 shadow-md"
+                >
+                  Пополнить 1000 поинтов (10 TON)
+                </button>
+                <button
+                  onClick={() => handleAddFunds(50)}
+                  className="bg-yellow-500 text-black px-4 py-2 rounded-md hover:bg-yellow-600 transition transform hover:scale-105 shadow-md"
+                >
+                  Пополнить 5000 поинтов (50 TON)
+                </button>
+              </div>
             </>
           ) : (
-            <TonConnectButton />
+            <>
+              <TonConnectButton />
+              <p className="text-sm text-gray-400">Пожалуйста, подключите кошелек Telegram TON Wallet.</p>
+            </>
           )}
         </div>
       </div>
@@ -105,7 +142,7 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
           onClick={handleCopyReferralLink}
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition transform hover:scale-105 shadow-md"
         >
-          Copy refferal link
+          Copy referral link
         </button>
       </div>
   
@@ -127,13 +164,11 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500">You dont have any refferal users</p>
+          <p className="text-gray-500">You don't have any referral users</p>
         )}
       </div>
     </div>
   );
-  
-  
 };
 
 export default Wallet;
