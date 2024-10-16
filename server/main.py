@@ -3,6 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from server.routers import logs, telegram, task
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -23,6 +24,7 @@ app.add_middleware(
 app.include_router(logs, prefix="/api/logs", tags=["logs"])
 app.include_router(telegram, prefix="/api/auth", tags=["telegram"])
 app.include_router(task, prefix="/api/task", tags=["task"])
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 for route in app.routes:
     methods = ','.join(route.methods)
