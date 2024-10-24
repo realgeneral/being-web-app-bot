@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { TonConnectButton, useTonConnectUI, TonConnectUIProvider } from '@tonconnect/ui-react';
+import { TonConnectButton, useTonConnectUI } from '@tonconnect/ui-react';
 
 // Замените на ваш базовый URL API
 const API_BASE_URL = 'https://nollab.ru:8000';
 
 interface Referral {
   username: string;
-  income: number;
 }
 
 interface User {
@@ -15,7 +14,7 @@ interface User {
   username: string;
   points: number;
   wallet_address?: string;
-  referrals?: Referral[];
+  referral_code: string;
 }
 
 interface WalletProps {
@@ -25,10 +24,14 @@ interface WalletProps {
 const Wallet: React.FC<WalletProps> = ({ user }) => {
   const [tonConnectUI] = useTonConnectUI();
   const walletAddress = tonConnectUI.connected && tonConnectUI.account?.address;
-  const [referrals, setReferrals] = useState<Referral[]>(user.referrals || []);
+  const [referrals, setReferrals] = useState<Referral[]>([]);
   const referralCount = referrals.length;
 
-  const referralLink = `$/referral/${user.username}`;
+  // Имя вашего Telegram-бота
+  const botUsername = 'beinghouse_bot'; // Замените на имя вашего бота
+
+  // Формируем реферальную ссылку с использованием referral_code
+  const referralLink = `https://t.me/${botUsername}?start=${user.referral_code}`;
 
   useEffect(() => {
     if (walletAddress) {
@@ -46,6 +49,21 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
         });
     }
   }, [walletAddress, user.id]);
+
+  // Новый useEffect для загрузки рефералов
+  useEffect(() => {
+    // Функция для загрузки рефералов
+    const fetchReferrals = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/users/${user.id}/referrals`);
+        setReferrals(response.data); // Предполагается, что API возвращает массив рефералов
+      } catch (error) {
+        console.error('Ошибка при загрузке рефералов:', error);
+      }
+    };
+
+    fetchReferrals();
+  }, [user.id]);
 
   // Функция для копирования реферальной ссылки
   const handleCopyReferralLink = () => {
@@ -70,14 +88,14 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
       validUntil: Date.now() + 5 * 60 * 1000, // Транзакция действительна 5 минут
       messages: [
         {
-          address: 'ВАШ_АДРЕС_КОШЕЛЬКА', // Замените на адрес вашего кошелька для приема платежей
+          address: 'UQCn7cWclf8OFtUaPXTTdactsVB5qCDgcbyfOUY6JMH1gvNK', // Замените на ваш адрес
           amount: (amountTON * 1e9).toString(), // Переводим TON в нанотоны
         },
       ],
     })
     .then(() => {
       alert('Транзакция успешно отправлена!');
-      // Здесь вы можете обновить баланс пользователя, отправив запрос на сервер
+      // Обновите баланс пользователя, если необходимо
     })
     .catch((error) => {
       console.error('Ошибка при отправке транзакции:', error);
@@ -91,7 +109,7 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
         <h1 className="text-2xl font-bold">My Wallet</h1>
         <span className="text-sm">@{user.username}</span>
       </header>
-  
+
       {/* Кнопка "Add Funds" и подключение кошелька в одном блоке */}
       <div className="flex justify-center my-8">
         <div className="flex flex-col items-center space-y-4">
@@ -127,29 +145,29 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
           )}
         </div>
       </div>
-  
+
       {/* Приглашение друзей */}
       <div className="mb-8 text-center bg-gray-800 p-2 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-4">Become a Friend</h2>
+        <h2 className="text-2xl font-bold mb-4">Пригласите друзей</h2>
         <p className="text-sm text-gray-400 mb-2">
-          Click on the link and wait for the bot to fully load to complete the task.
+          Поделитесь своей реферальной ссылкой, чтобы пригласить друзей и получить бонусы.
         </p>
         <p className="text-lg font-semibold mb-3 text-yellow-400">
-          Invite your friends and get 7% of their income
+          Пригласите друзей и получайте 7% от их дохода
         </p>
         {/* Кнопка копирования реферальной ссылки */}
         <button
           onClick={handleCopyReferralLink}
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition transform hover:scale-105 shadow-md"
         >
-          Copy referral link
+          Скопировать реферальную ссылку
         </button>
       </div>
-  
+
       {/* Рефералы */}
       <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
         <h2 className="text-lg font-bold mb-4">
-          Your referrals ({referralCount}):
+          Ваши рефералы ({referralCount}):
         </h2>
         {referrals.length > 0 ? (
           <ul className="space-y-2">
@@ -159,12 +177,11 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
                 className="flex justify-between items-center bg-gray-700 px-4 py-2 rounded-md shadow"
               >
                 <span className="text-sm font-medium">@{referral.username}</span>
-                <span className="text-green-400 font-bold">+{referral.income} points</span>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500">You don't have any referral users</p>
+          <p className="text-gray-500">У вас пока нет рефералов</p>
         )}
       </div>
     </div>

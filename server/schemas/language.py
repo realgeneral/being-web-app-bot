@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class LanguageBase(BaseModel):
     code: str
