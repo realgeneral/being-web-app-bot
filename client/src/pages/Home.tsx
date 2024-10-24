@@ -51,13 +51,12 @@ const Home: React.FC<HomeProps> = ({ user }) => {
     <div className="flex flex-col items-center w-full h-[var(--app-height)]">
       {/* Logo */}
       <div className="mt-6">
-        <img src={logo} alt="Bot Logo" className="w-32 h-32" />
+        <img src={logo} alt="Bot Logo" className="w-20 h-20" />
       </div>
 
       {/* Greeting */}
-      <div className="mt-4 text-center">
-        <h1 className="text-4xl font-bold mt-0">Welcome, {username}!</h1>
-        <p className="text-sm text-gray-400">Balance: {balance}</p>
+      <div className="mt-0 text-center">
+        <h1 className="text-2xl font-bold mt-0">Welcome, {username}!</h1>
       </div>
 
       {/* Main content */}

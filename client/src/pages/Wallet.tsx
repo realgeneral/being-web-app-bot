@@ -91,38 +91,43 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
         <h1 className="text-2xl font-bold">My Wallet</h1>
         <span className="text-sm">@{user.username}</span>
       </header>
-  
-      {/* Кнопка "Add Funds" и подключение кошелька в одном блоке */}
+    
+      {/* "Add Funds" button and wallet connection in one block */}
       <div className="flex justify-center my-8">
         <div className="flex flex-col items-center space-y-4">
           {walletAddress ? (
             <>
-              <p className="text-sm text-green-400">Кошелек подключен: {walletAddress}</p>
-              <div className="flex space-x-4">
+              <p className="text-sm text-green-400">
+                Wallet connected: {`${walletAddress.slice(0, 4)}.....${walletAddress.slice(-4)}`}
+              </p>
+              <div className="flex space-x-2">
                 <button
                   onClick={() => handleAddFunds(3)}
-                  className="bg-yellow-500 text-black px-4 py-2 rounded-md hover:bg-yellow-600 transition transform hover:scale-105 shadow-md"
+                  className="bg-yellow-500 text-black text-sm px-2 py-1 rounded-md hover:bg-yellow-600 transition transform hover:scale-105 shadow-md"
                 >
-                  Пополнить 300 поинтов (3 TON)
+                  Add 300 points
+                   (3 TON)
                 </button>
                 <button
                   onClick={() => handleAddFunds(10)}
-                  className="bg-yellow-500 text-black px-4 py-2 rounded-md hover:bg-yellow-600 transition transform hover:scale-105 shadow-md"
+                  className="bg-yellow-500 text-black text-sm px-2 py-1 rounded-md hover:bg-yellow-600 transition transform hover:scale-105 shadow-md"
                 >
-                  Пополнить 1000 поинтов (10 TON)
+                  Add 1000 points
+                   (10 TON)
                 </button>
                 <button
                   onClick={() => handleAddFunds(50)}
-                  className="bg-yellow-500 text-black px-4 py-2 rounded-md hover:bg-yellow-600 transition transform hover:scale-105 shadow-md"
+                  className="bg-yellow-500 text-black text-sm px-2 py-1 rounded-md hover:bg-yellow-600 transition transform hover:scale-105 shadow-md"
                 >
-                  Пополнить 5000 поинтов (50 TON)
+                  Add 5000 points
+                   (50 TON)
                 </button>
               </div>
             </>
           ) : (
             <>
               <TonConnectButton />
-              <p className="text-sm text-gray-400">Пожалуйста, подключите кошелек Telegram TON Wallet.</p>
+              <p className="text-sm text-gray-400">Please connect your Telegram TON Wallet.</p>
             </>
           )}
         </div>
