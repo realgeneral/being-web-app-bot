@@ -109,13 +109,6 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
         <h1 className="text-2xl font-bold">My Wallet</h1>
         <span className="text-sm">@{user.username}</span>
       </header>
-<<<<<<< HEAD
-    
-      {/* "Add Funds" button and wallet connection in one block */}
-=======
-
-      {/* Кнопка "Add Funds" и подключение кошелька в одном блоке */}
->>>>>>> a07af3415ddfe236b8b90b38121e7ec98c19b3f1
       <div className="flex justify-center my-8">
         <div className="flex flex-col items-center space-y-4">
           {walletAddress ? (
