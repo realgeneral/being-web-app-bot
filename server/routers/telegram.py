@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from urllib.parse import unquote, parse_qsl
+from typing import Optional
 
 import hashlib
 import hmac
@@ -10,7 +11,8 @@ import os
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from server.database import get_session
-from server.crud import get_user_by_telegram_id, create_user
+from server.crud import get_user_by_telegram_id, create_user, get_user_by_referral_code, generate_unique_referral_code, increment_user_points, add_referral_record
+
 from server.schemas.user import UserCreate, UserResponse
 
 router = APIRouter()
@@ -21,6 +23,8 @@ logger = logging.getLogger(__name__)
 
 class TelegramAuthData(BaseModel):
     initData: str
+    startParam: Optional[str] = None
+
 
 
 def verify_telegram_init_data(init_data: str) -> bool:
@@ -68,8 +72,22 @@ async def telegram_auth(
 
         if existing_user:
             return existing_user
-            logger.error(f"SUCESS ")
         else:
+              # Извлекаем реферальный код из start_param, если он есть
+            start_param =  decoded_data.get('start_param') or data.startParam
+            referral_id = None
+
+            if start_param:
+                referrer = await get_user_by_referral_code(db, start_param)
+                if referrer:
+                    referral_id = referrer.id
+                else:
+                    logger.warning(f"Invalid referral code: {start_param}")
+            else:
+                logger.info("No referral code provided")
+            
+            referral_code = await generate_unique_referral_code(db)
+
             # Создаем нового пользователя
             new_user = UserCreate(
                 telegram_id=telegram_id,
@@ -78,10 +96,24 @@ async def telegram_auth(
                 last_name=user_data.get('last_name'),
                 is_premium=user_data.get('is_premium', False),
                 language_code=user_data.get('language_code', 'en'),
+                referral_id=referral_id,
+                referral_code=referral_code
                 # Добавьте дополнительные поля при необходимости
             )
             created_user = await create_user(db, new_user)
+
+            # Если пользователь пришёл по реферальному коду, добавляем 100 поинтов рефереру
+            if referral_id:
+                # Начисляем 100 поинтов рефереру
+                await increment_user_points(db, referral_id, 100)
+                await add_referral_record(db, referrer_id=referral_id, referred_id=created_user.id)
+                logger.info(f"Added 100 points to referrer with ID {referral_id}")
+            else:
+                logger.info("User did not come via referral")
+
             return created_user
     except Exception as e:
         logger.error(f"Error during Telegram authentication: {str(e)}")
         raise HTTPException(status_code=400, detail="Failed to authenticate Telegram data")
+
+

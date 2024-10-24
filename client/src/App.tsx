@@ -47,7 +47,11 @@ const App: React.FC = () => {
           sendLog('Init data received: ' + initData); // Log once when received
 
           if (initData) {
-            const response = await axios.post(`${API_BASE_URL}/api/auth/telegram`, { initData }, {
+            const urlParams = new URLSearchParams(initData);
+            const startParam = urlParams.get('start_param');
+            sendLog('Start param: ' + startParam);
+
+            const response = await axios.post(`${API_BASE_URL}/api/auth/telegram`, { initData, startParam }, {
               headers: {
                 'ngrok-skip-browser-warning': 'true', // Добавляем заголовок
               },
