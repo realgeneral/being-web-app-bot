@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import logo from '../assets/logo.png'; // Ensure the logo image is placed correctly
+import logo from '../assets/logo.png'; // Убедитесь, что логотип размещен корректно
 import axios from 'axios';
 
-// Interface for props accepted by Home component
+// Интерфейс для свойств, принимаемых компонентом Home
 interface HomeProps {
   user: {
     username: string;
@@ -20,7 +20,7 @@ interface NewsItem {
   created_at: string;
 }
 
-// Interface for viewport height change event
+// Интерфейс для события изменения высоты окна просмотра
 interface ViewportChangedEvent {
   isStateStable: boolean;
 }
@@ -32,8 +32,13 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [selectedNewsItem, setSelectedNewsItem] = useState<NewsItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const API_BASE_URL = 'https://nollab.ru:8000';
+
+  // Список ID администраторов
+  const ADMIN_IDS = [7154683616]; // Замените на реальные ID администраторов
+  const isAdmin = ADMIN_IDS.includes(user.telegram_id);
 
   // Функция для получения новостей с бэкенда
   useEffect(() => {
@@ -53,7 +58,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
     fetchNewsItems();
   }, [user.telegram_id]);
 
-  // Функции для открытия и закрытия модального окна
+  // Функции для открытия и закрытия модального окна просмотра новости
   const openModal = async (newsItem: NewsItem) => {
     try {
       const response = await axios.get<NewsItem>(`${API_BASE_URL}/api/news/${newsItem.id}`, {
@@ -73,21 +78,81 @@ const Home: React.FC<HomeProps> = ({ user }) => {
     setIsModalOpen(false);
   };
 
+  // Функция для удаления новости
+  const deleteNewsItem = async (newsItem: NewsItem) => {
+    if (!isAdmin) return;
+
+    if (!window.confirm('Вы уверены, что хотите удалить эту новость?')) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API_BASE_URL}/api/news/${newsItem.id}`, {
+        headers: {
+          'X-Telegram-ID': user.telegram_id.toString(),
+        },
+      });
+      // Удаляем новость из состояния
+      setNewsItems((prevItems) => prevItems.filter((item) => item.id !== newsItem.id));
+      alert('Новость успешно удалена.');
+    } catch (error) {
+      console.error('Ошибка при удалении новости:', error);
+      alert('Не удалось удалить новость.');
+    }
+  };
+
+  // Функции для открытия и закрытия модального окна создания новости
+  const openCreateModal = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  const closeCreateModal = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  // Функция для обработки создания новой новости
+  const handleCreateNews = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const newNewsItem = {
+      title: formData.get('title') as string,
+      description: formData.get('description') as string,
+      content: formData.get('content') as string,
+    };
+
+    try {
+      const response = await axios.post<NewsItem>(`${API_BASE_URL}/api/news/`, newNewsItem, {
+        headers: {
+          'X-Telegram-ID': user.telegram_id.toString(),
+        },
+      });
+
+      // Добавляем новую новость в состояние
+      setNewsItems((prevItems) => [response.data, ...prevItems]);
+      closeCreateModal();
+    } catch (error) {
+      console.error('Ошибка при создании новости:', error);
+      alert('Не удалось создать новость.');
+    }
+  };
+
   useEffect(() => {
-    // Connect to Telegram WebApp to get window height
+    // Подключение к Telegram WebApp для получения высоты окна
     const tg = window.Telegram.WebApp;
 
-    // Set container height according to viewport height
+    // Установка высоты контейнера в соответствии с высотой окна просмотра
     document.documentElement.style.setProperty('--app-height', `${tg.viewportHeight}px`);
 
-    // Handle viewport height change event
+    // Обработка события изменения высоты окна просмотра
     tg.onEvent('viewportChanged', (event: ViewportChangedEvent) => {
       if (event.isStateStable) {
         document.documentElement.style.setProperty('--app-height', `${tg.viewportStableHeight}px`);
       }
     });
 
-    // Notify that the mini-app is ready
+    // Уведомляем, что мини-приложение готово
     tg.ready();
 
     return () => {
@@ -97,31 +162,55 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
   return (
     <div className="flex flex-col items-center w-full h-[var(--app-height)]">
-      {/* Logo */}
+      {/* Логотип */}
       <div className="mt-6">
         <img src={logo} alt="Bot Logo" className="w-32 h-32" />
       </div>
 
-      {/* Greeting */}
+      {/* Приветствие */}
       <div className="mt-4 text-center">
         <h1 className="text-4xl font-bold mt-0">Welcome, {username}!</h1>
         <p className="text-sm text-gray-400">Balance: {balance}</p>
       </div>
 
-      {/* Main content */}
+      {/* Основной контент */}
       <div className="flex-1 w-full px-4 py-6 overflow-auto">
-        {/* News block */}
+        {/* Администраторские элементы управления */}
+        {isAdmin && (
+          <div className="mb-4">
+            <button
+              onClick={openCreateModal}
+              className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded"
+            >
+              Создать новость
+            </button>
+          </div>
+        )}
+
+        {/* Блок новостей */}
         <section className="w-full">
-          <h2 className="text-xl font-bold mb-4">Latest News</h2>
+          <h2 className="text-xl font-bold mb-4">Последние новости</h2>
           <div className="space-y-4">
-            {newsItems.map((item, index) => (
+            {newsItems.map((item) => (
               <div
-              key={item.id}
-              className="bg-gray-800 p-4 rounded shadow hover:bg-gray-700 transition cursor-pointer"
-              onClick={() => openModal(item)}
+                key={item.id}
+                className="bg-gray-800 p-4 rounded shadow hover:bg-gray-700 transition cursor-pointer relative"
+                onClick={() => openModal(item)}
               >
-              <h3 className="text-lg font-semibold">{item.title}</h3>
-              <p className="text-sm text-gray-300 mt-2">{item.description}</p>
+                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <p className="text-sm text-gray-300 mt-2">{item.description}</p>
+                {/* Кнопка удаления для администраторов */}
+                {isAdmin && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteNewsItem(item);
+                    }}
+                    className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white py-1 px-2 rounded"
+                  >
+                    Удалить
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -140,6 +229,57 @@ const Home: React.FC<HomeProps> = ({ user }) => {
             >
               Закрыть
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно для создания новости */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-gray-900 p-6 rounded-lg w-11/12 max-w-lg">
+            <h2 className="text-xl font-bold mb-4">Создать новость</h2>
+            <form onSubmit={handleCreateNews}>
+              <div className="mb-4">
+                <label className="block text-gray-300 mb-2">Заголовок</label>
+                <input
+                  type="text"
+                  name="title"
+                  className="w-full p-2 rounded bg-gray-800 text-white"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-300 mb-2">Описание</label>
+                <textarea
+                  name="description"
+                  className="w-full p-2 rounded bg-gray-800 text-white"
+                  required
+                ></textarea>
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-300 mb-2">Содержание</label>
+                <textarea
+                  name="content"
+                  className="w-full p-2 rounded bg-gray-800 text-white"
+                  required
+                ></textarea>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={closeCreateModal}
+                  className="mr-2 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded"
+                >
+                  Отмена
+                </button>
+                <button
+                  type="submit"
+                  className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded"
+                >
+                  Создать
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
