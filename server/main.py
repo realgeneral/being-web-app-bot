@@ -2,7 +2,7 @@
 from fastapi.routing import APIRoute
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from server.routers import logs, telegram, task, users
+from server.routers import admin_app, logs, telegram, task, users
 from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
