@@ -1,9 +1,7 @@
 # models.py
 from sqlalchemy import Column, Integer, String, Text, DateTime
-from sqlalchemy.orm import declarative_base
+from .base import Base
 import datetime
-
-Base = declarative_base()
 
 class News(Base):
     __tablename__ = 'news'
