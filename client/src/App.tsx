@@ -115,7 +115,7 @@ const App: React.FC = () => {
             <Route path="/earn" element={<Earn user={user} />} />
             <Route
               path="/mytask"
-              element={isAdmin ? <AdminStatistics user={user} /> : <MyTask user={user} />}
+              element={isAdmin ? <MyTask user={user} /> : <MyTask user={user} />}
             />
             <Route path="/wallet" element={<Wallet user={user} />} />
           </Routes>
