@@ -6,6 +6,8 @@ from sqlalchemy.future import select
 from server.dependencies import get_current_user
 from server.models import User, Referral
 from server.schemas.refferals import ReferralResponse
+from typing import List
+
 
 router = APIRouter()
 
