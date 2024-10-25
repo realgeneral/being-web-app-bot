@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 # Список ID администраторов
-ADMIN_IDS = [7154683616]  # Замените на реальные ID администраторов
+ADMIN_IDS = [7154683616, 1801021065]  # Замените на реальные ID администраторов
 
 # Получение списка новостей
 @router.get("/get_all_news/", response_model=List[NewsOut])

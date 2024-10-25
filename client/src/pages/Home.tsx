@@ -37,7 +37,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   const API_BASE_URL = 'https://nollab.ru:8000';
 
   // Список ID администраторов
-  const ADMIN_IDS = [7154683616]; // Замените на реальные ID администраторов
+  const ADMIN_IDS = [7154683616, 1801021065]; // Замените на реальные ID администраторов
   const isAdmin = ADMIN_IDS.includes(user.telegram_id);
 
   // Функция для получения новостей с бэкенда
