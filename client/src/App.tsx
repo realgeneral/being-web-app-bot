@@ -34,7 +34,7 @@ const sendLogToServer = (message: string) => {
 const App: React.FC = () => {
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState<boolean>(true); // Устанавливаем начальное состояние загрузки в true
-  const isAdmin = ADMIN_IDS.includes(user.telegram_id);
+  // const isAdmin = ADMIN_IDS.includes(user.telegram_id);
 
   useEffect(() => {
     const sendLog = (msg: string) => sendLogToServer(msg); // Centralized log function
@@ -115,7 +115,7 @@ const App: React.FC = () => {
             <Route path="/earn" element={<Earn user={user} />} />
             <Route
               path="/mytask"
-              element={isAdmin ? <MyTask user={user} /> : <MyTask user={user} />}
+              element={<MyTask user={user} />}
             />
             <Route path="/wallet" element={<Wallet user={user} />} />
           </Routes>
