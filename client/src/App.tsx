@@ -6,7 +6,7 @@ import Home from './pages/Home';
 import Earn from './pages/Earn';
 import MyTask from './pages/MyTask';
 import Wallet from './pages/Wallet';
-import AdminStatistics from './pages/AdminStatistics';
+// import AdminStatistics from './pages/AdminStatistics';
 import Loading from './components/Loading'; // Импортируем компонент Loading
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 
