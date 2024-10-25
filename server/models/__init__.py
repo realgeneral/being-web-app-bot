@@ -9,3 +9,4 @@ from .bot_texts import BotText
 from .task_clicks import TaskClick
 from .task_status import TaskStatus
 from .task_types import TaskType
+from .news import News

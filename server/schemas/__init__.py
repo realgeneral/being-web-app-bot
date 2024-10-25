@@ -5,3 +5,9 @@ from .user import (
     UserInDB,
     UserResponse
 )
+from .news import (
+    NewsBase,
+    NewsCreate,
+    NewsUpdate,
+    NewsOut
+)
