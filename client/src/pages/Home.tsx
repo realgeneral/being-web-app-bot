@@ -44,7 +44,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   useEffect(() => {
     const fetchNewsItems = async () => {
       try {
-        const response = await axios.get<NewsItem[]>(`${API_BASE_URL}/api/news/`, {
+        const response = await axios.get<NewsItem[]>(`${API_BASE_URL}/api/news/get_all_news/`, {
           headers: {
             'X-Telegram-ID': user.telegram_id.toString(),
           },
@@ -61,7 +61,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   // Функции для открытия и закрытия модального окна просмотра новости
   const openModal = async (newsItem: NewsItem) => {
     try {
-      const response = await axios.get<NewsItem>(`${API_BASE_URL}/api/news/${newsItem.id}`, {
+      const response = await axios.get<NewsItem>(`${API_BASE_URL}/api/news/get_news/${newsItem.id}`, {
         headers: {
           'X-Telegram-ID': user.telegram_id.toString(),
         },
@@ -87,7 +87,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${API_BASE_URL}/api/news/${newsItem.id}`, {
+      await axios.delete(`${API_BASE_URL}/api/news/delete/${newsItem.id}`, {
         headers: {
           'X-Telegram-ID': user.telegram_id.toString(),
         },
@@ -123,7 +123,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
     };
 
     try {
-      const response = await axios.post<NewsItem>(`${API_BASE_URL}/api/news/`, newNewsItem, {
+      const response = await axios.post<NewsItem>(`${API_BASE_URL}/api/news/create/`, newNewsItem, {
         headers: {
           'X-Telegram-ID': user.telegram_id.toString(),
         },

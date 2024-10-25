@@ -25,7 +25,7 @@ app.include_router(logs, prefix="/api/logs", tags=["logs"])
 app.include_router(telegram, prefix="/api/auth", tags=["telegram"])
 app.include_router(task, prefix="/api/task", tags=["task"])
 app.include_router(users, prefix="/api/users", tags=["users"])
-app.include_router(news, prefix="/api/news", tags=["users"])
+app.include_router(news, prefix="/api/news", tags=["news"])
 
 app.mount("/", StaticFiles(directory="server/static", html=True), name="static")
 

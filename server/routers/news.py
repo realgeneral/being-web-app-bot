@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 ADMIN_IDS = [7154683616]  # Замените на реальные ID администраторов
 
 # Получение списка новостей
-@router.get("/news/", response_model=List[NewsOut])
+@router.get("/get_all_news/", response_model=List[NewsOut])
 async def get_news(session: AsyncSession = Depends(get_session)):
     try:
         result = await session.execute(select(News).order_by(News.created_at.desc()))
@@ -31,7 +31,7 @@ async def get_news(session: AsyncSession = Depends(get_session)):
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
 
 # Получение конкретной новости
-@router.get("/news/{news_id}", response_model=NewsOut)
+@router.get("/get_news/{news_id}", response_model=NewsOut)
 async def get_news_item(news_id: int, session: AsyncSession = Depends(get_session)):
     try:
         result = await session.execute(select(News).where(News.id == news_id))
@@ -47,7 +47,7 @@ async def get_news_item(news_id: int, session: AsyncSession = Depends(get_sessio
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
 
 # Создание новой новости (только для администраторов)
-@router.post("/news/", response_model=NewsOut, status_code=201)
+@router.post("/create/", response_model=NewsOut, status_code=201)
 async def create_news(
     news: NewsCreate,
     current_user: UserResponse = Depends(get_current_user),
@@ -100,7 +100,7 @@ async def update_news(
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
 
 # Удаление новости (только для администраторов)
-@router.delete("/news/{news_id}", status_code=204)
+@router.delete("/delete/{news_id}", status_code=204)
 async def delete_news(
     news_id: int,
     current_user: UserResponse = Depends(get_current_user),
