@@ -170,7 +170,6 @@ const Home: React.FC<HomeProps> = ({ user }) => {
       {/* Приветствие */}
       <div className="mt-4 text-center">
         <h1 className="text-4xl font-bold mt-0">Welcome, {username}!</h1>
-        <p className="text-sm text-gray-400">Balance: {balance}</p>
       </div>
 
       {/* Основной контент */}
@@ -189,7 +188,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
 
         {/* Блок новостей */}
         <section className="w-full">
-          <h2 className="text-xl font-bold mb-4">Последние новости</h2>
+          <h2 className="text-xl font-bold mb-4">Latest news</h2>
           <div className="space-y-4">
             {newsItems.map((item) => (
               <div
@@ -227,7 +226,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
               onClick={closeModal}
               className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
             >
-              Закрыть
+              Close
             </button>
           </div>
         </div>

@@ -1,4 +1,5 @@
 // Layout.tsx
+
 import React, { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 
@@ -8,6 +9,9 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, user }) => {
+  const ADMIN_IDS = [7154683616]; // Замените на реальные ID администраторов
+  const isAdmin = ADMIN_IDS.includes(user.telegram_id);
+
   return (
     <div className="relative h-screen bg-black text-white">
       {/* Header */}
@@ -44,8 +48,8 @@ const Layout: React.FC<LayoutProps> = ({ children, user }) => {
           to="/mytask"
           className="text-center flex flex-col items-center min-w-[60px] text-yellow-500"
         >
-          <div>📋</div>
-          <span>MyTask</span>
+          <div>{isAdmin ? '📊' : '📋'}</div>
+          <span>{isAdmin ? 'Stats' : 'MyTask'}</span>
         </NavLink>
         <NavLink
           to="/wallet"
