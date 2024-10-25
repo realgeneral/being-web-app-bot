@@ -1,12 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from '../assets/logo.png'; // Ensure the logo image is placed correctly
+import axios from 'axios';
 
 // Interface for props accepted by Home component
 interface HomeProps {
   user: {
     username: string;
     points: number;
+    telegram_id: number;
   };
+}
+
+// Интерфейс для элемента новости
+interface NewsItem {
+  id: number;
+  title: string;
+  description?: string;
+  content?: string;
+  created_at: string;
 }
 
 // Interface for viewport height change event
@@ -18,12 +29,49 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   const username = user.username;
   const balance = `${user.points} Points`;
 
-  // News to display
-  const newsItems = [
-    { title: 'Welcome to Our Service!', description: 'Stay tuned for updates!' },
-    { title: 'Maintenance Scheduled', description: 'Service maintenance at 12:00 AM UTC.' },
-    { title: 'New Features Released', description: 'Check out the latest features in the Earn section.' },
-  ];
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const [selectedNewsItem, setSelectedNewsItem] = useState<NewsItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const API_BASE_URL = 'https://nollab.ru:8000';
+
+  // Функция для получения новостей с бэкенда
+  useEffect(() => {
+    const fetchNewsItems = async () => {
+      try {
+        const response = await axios.get<NewsItem[]>(`${API_BASE_URL}/api/news/`, {
+          headers: {
+            'X-Telegram-ID': user.telegram_id.toString(),
+          },
+        });
+        setNewsItems(response.data);
+      } catch (error) {
+        console.error('Ошибка при получении новостей:', error);
+      }
+    };
+
+    fetchNewsItems();
+  }, [user.telegram_id]);
+
+  // Функции для открытия и закрытия модального окна
+  const openModal = async (newsItem: NewsItem) => {
+    try {
+      const response = await axios.get<NewsItem>(`${API_BASE_URL}/api/news/${newsItem.id}`, {
+        headers: {
+          'X-Telegram-ID': user.telegram_id.toString(),
+        },
+      });
+      setSelectedNewsItem(response.data);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error('Ошибка при получении деталей новости:', error);
+    }
+  };
+
+  const closeModal = () => {
+    setSelectedNewsItem(null);
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     // Connect to Telegram WebApp to get window height
@@ -68,16 +116,33 @@ const Home: React.FC<HomeProps> = ({ user }) => {
           <div className="space-y-4">
             {newsItems.map((item, index) => (
               <div
-                key={index}
-                className="bg-gray-800 p-4 rounded shadow hover:bg-gray-700 transition"
+              key={item.id}
+              className="bg-gray-800 p-4 rounded shadow hover:bg-gray-700 transition cursor-pointer"
+              onClick={() => openModal(item)}
               >
-                <h3 className="text-lg font-semibold">{item.title}</h3>
-                <p className="text-sm text-gray-300 mt-2">{item.description}</p>
+              <h3 className="text-lg font-semibold">{item.title}</h3>
+              <p className="text-sm text-gray-300 mt-2">{item.description}</p>
               </div>
             ))}
           </div>
         </section>
       </div>
+
+      {/* Модальное окно для отображения деталей новости */}
+      {isModalOpen && selectedNewsItem && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-gray-900 p-6 rounded-lg w-11/12 max-w-lg">
+            <h2 className="text-xl font-bold mb-4">{selectedNewsItem.title}</h2>
+            <p className="text-sm text-gray-300 mb-4">{selectedNewsItem.content}</p>
+            <button
+              onClick={closeModal}
+              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
+            >
+              Закрыть
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
