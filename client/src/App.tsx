@@ -15,6 +15,7 @@ import { TonConnectUIProvider } from '@tonconnect/ui-react';
 const API_BASE_URL = 'https://nollab.ru:8000';
 const ADMIN_IDS = [7154683616, 1801021065]; // Замените на реальные ID администраторов
 // Function to send logs to the server
+
 const sendLogToServer = (message: string) => {
   axios
     .post(`${API_BASE_URL}/api/logs/`, { message }, {
