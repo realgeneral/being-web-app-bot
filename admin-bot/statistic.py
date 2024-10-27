@@ -7,33 +7,53 @@ from sqlalchemy import func
 from server.models import User, Task, TaskStatus
 from server.database import get_session
 
+import pandas as pd
+import asyncio
+import os
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from datetime import datetime, timedelta
+from sqlalchemy import func
+from server.models import User, Task, TaskStatus
+from server.database import get_session
+
 async def export_tables_to_excel():
+    print("Текущая рабочая директория:", os.getcwd())
     async for session in get_session():
-        try:
-            # Экспорт таблицы пользователей
-            users_result = await session.execute(select(User))
-            users = users_result.scalars().all()
-            users_data = [user.__dict__ for user in users]
-            users_df = pd.DataFrame(users_data)
-            users_df.to_excel('users.xlsx', index=False)
+        print("Сессия базы данных открыта")
+        # Удаляем блок try...except для отладки
+        # Экспорт таблицы пользователей
+        print("Экспорт таблицы пользователей...")
+        users_result = await session.execute(select(User))
+        users = users_result.scalars().all()
+        print(f"Количество пользователей: {len(users)}")
+        users_data = [user.__dict__ for user in users]
+        users_df = pd.DataFrame(users_data)
+        users_df.to_excel('users.xlsx', index=False)
+        print("Файл users.xlsx сохранён")
 
-            # Экспорт таблицы задач
-            tasks_result = await session.execute(select(Task))
-            tasks = tasks_result.scalars().all()
-            tasks_data = [task.__dict__ for task in tasks]
-            tasks_df = pd.DataFrame(tasks_data)
-            tasks_df.to_excel('tasks.xlsx', index=False)
+        # Экспорт таблицы задач
+        print("Экспорт таблицы задач...")
+        tasks_result = await session.execute(select(Task))
+        tasks = tasks_result.scalars().all()
+        print(f"Количество задач: {len(tasks)}")
+        tasks_data = [task.__dict__ for task in tasks]
+        tasks_df = pd.DataFrame(tasks_data)
+        tasks_df.to_excel('tasks.xlsx', index=False)
+        print("Файл tasks.xlsx сохранён")
 
-            # Экспорт таблицы статусов задач
-            statuses_result = await session.execute(select(TaskStatus))
-            statuses = statuses_result.scalars().all()
-            statuses_data = [status.__dict__ for status in statuses]
-            statuses_df = pd.DataFrame(statuses_data)
-            statuses_df.to_excel('task_statuses.xlsx', index=False)
+        # Экспорт таблицы статусов задач
+        print("Экспорт таблицы статусов задач...")
+        statuses_result = await session.execute(select(TaskStatus))
+        statuses = statuses_result.scalars().all()
+        print(f"Количество статусов: {len(statuses)}")
+        statuses_data = [status.__dict__ for status in statuses]
+        statuses_df = pd.DataFrame(statuses_data)
+        statuses_df.to_excel('task_statuses.xlsx', index=False)
+        print("Файл task_statuses.xlsx сохранён")
 
-            print("Экспорт таблиц завершен.")
-        except Exception as e:
-            print(f"Ошибка при экспорте таблиц: {e}")
+        print("Экспорт таблиц завершен.")
+
 
 async def get_user_statistics():
     async for session in get_session():
