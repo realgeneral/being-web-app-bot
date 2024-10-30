@@ -93,3 +93,4 @@ async def get_task_statistics():
         'total_tasks': total_tasks_count,
         'task_statuses': task_statuses
     }
+

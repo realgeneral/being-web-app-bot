@@ -37,20 +37,28 @@ async def cmd_user_stats(message: types.Message):
         stats_user = await get_user_statistics()
         stats_task = await get_task_statistics()
 
-        response = f"============== СТАТИСТИКА =================\n"
+        response = f"*============== СТАТИСТИКА =================*\n"
 
         response += (
-            f"Общее количество пользователей: {stats_user['total_users']}\n"
-            f"Присоединилось за последние сутки: {stats_user['recent_users']}"
+            f"🔸 _Пользователи_"
+            f"  Общее количество пользователей: {stats_user['total_users']}\n"
+            f"  Присоединилось за последние сутки: {stats_user['recent_users']}\n\n"
         )
-        for status, count in stats_task['task_statuses'].items():
-            response += f"Количество задач со статусом '{status}': {count}\n"
         
-        response += f"=======================================\n"
+        response += f"🔸 _Задачи_ \n"
+        response += f"  Общее количество задач: {stats_task['total_tasks']}\n"
+
+        for status, count in stats_task['task_statuses'].items():
+            response += f"  Количество задач со статусом '{status}': {count}\n"
+        
+        
+        response += f"\n🔸 _Выплаты_ \n"
+
+        response += f"*=======================================*\n"
             
         await message.reply(response)
     except Exception as e:
-        await message.reply(f"Произошла ошибка при получении статистики: {str(e)}")
+        await message.reply(f"Произошла ошибка при получении статистики: {str(e)}", parse_mode='Markdown')
 
 
 
