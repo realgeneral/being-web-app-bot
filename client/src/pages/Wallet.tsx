@@ -11,6 +11,7 @@ interface Referral {
 
 interface User {
   id: number;
+  telegram_id: number; // Добавлено поле telegram_id
   username: string;
   points: number;
   wallet_address?: string;
@@ -37,10 +38,18 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
     if (walletAddress) {
       // Отправляем адрес кошелька на сервер
       axios
-        .post(`${API_BASE_URL}/api/wallet/connect`, {
-          wallet_address: walletAddress,
-          user_id: user.id,
-        })
+        .post(
+          `${API_BASE_URL}/api/wallet/connect`,
+          {
+            wallet_address: walletAddress,
+            user_id: user.id,
+          },
+          {
+            headers: {
+              'X-Telegram-ID': user.telegram_id.toString(),
+            },
+          }
+        )
         .then((response) => {
           // Обработка успешного ответа
         })
@@ -48,14 +57,18 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
           console.error('Ошибка при отправке адреса кошелька:', error);
         });
     }
-  }, [walletAddress, user.id]);
+  }, [walletAddress, user.id, user.telegram_id]);
 
   // Новый useEffect для загрузки рефералов
   useEffect(() => {
     // Функция для загрузки рефералов
     const fetchReferrals = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/users/${user.id}/referrals`);
+        const response = await axios.get(`${API_BASE_URL}/api/users/${user.id}/referrals`, {
+          headers: {
+            'X-Telegram-ID': user.telegram_id.toString(),
+          },
+        });
         setReferrals(response.data); // Предполагается, что API возвращает массив рефералов
       } catch (error) {
         console.error('Ошибка при загрузке рефералов:', error);
@@ -63,7 +76,7 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
     };
 
     fetchReferrals();
-  }, [user.id]);
+  }, [user.id, user.telegram_id]);
 
   // Функция для копирования реферальной ссылки
   const handleCopyReferralLink = () => {
@@ -82,10 +95,10 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
       alert('Пожалуйста, подключите кошелек перед пополнением.');
       return;
     }
-  
+
     let transactionId: number | null = null;
     let transactionCreated: boolean = false;
-  
+
     // Создаем запись транзакции на сервере
     axios
       .post(
@@ -97,13 +110,16 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
           transaction_type: 'deposit',
         },
         {
+          headers: {
+            'X-Telegram-ID': user.telegram_id.toString(),
+          },
           withCredentials: true, // Если ваш API использует аутентификационные куки
         }
       )
       .then((response) => {
         transactionCreated = true;
         transactionId = response.data.id;
-  
+
         // Отправляем транзакцию через TonConnect
         return tonConnectUI.sendTransaction({
           validUntil: Date.now() + 5 * 60 * 1000, // Транзакция действительна 5 минут
@@ -117,13 +133,18 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
       })
       .then(() => {
         alert('Транзакция успешно отправлена!');
-  
+
         // Отправляем на сервер информацию об успешной транзакции
         axios
           .put(
             `${API_BASE_URL}/api/wallet/transactions/${transactionId}/`,
             { status: 'completed' },
-            { withCredentials: true }
+            {
+              headers: {
+                'X-Telegram-ID': user.telegram_id.toString(),
+              },
+              withCredentials: true,
+            }
           )
           .then(() => {
             // Обновляем баланс пользователя или список транзакций
@@ -140,13 +161,18 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
         } else {
           console.error('Ошибка при отправке транзакции:', error);
           alert('Ошибка при отправке транзакции. Попробуйте еще раз.');
-  
+
           // Отправляем на сервер информацию о неудачной транзакции
           axios
             .put(
               `${API_BASE_URL}/api/wallet/transactions/${transactionId}/`,
               { status: 'failed' },
-              { withCredentials: true }
+              {
+                headers: {
+                  'X-Telegram-ID': user.telegram_id.toString(),
+                },
+                withCredentials: true,
+              }
             )
             .then(() => {
               // Дополнительные действия после обновления статуса
