@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import sys
 import os
 
@@ -39,7 +40,11 @@ async def cmd_user_stats(message: types.Message):
         stats_task = await get_task_statistics()
         stats_wallet = await get_wallet_statistics()
 
-        response = f"*============== СТАТИСТИКА =================*\n\n"
+        # Получаем текущую дату и время
+        current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        response = f"*============== СТАТИСТИКА =================*\n"
+        response += f"`{current_datetime}`\n\n"
 
         response += (
             f"🔸 _Пользователи_\n"
