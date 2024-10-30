@@ -18,15 +18,44 @@ ADMIN_IDS = [7154683616, 1801021065];
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
+def admin_only(handler):
+    async def wrapper(message: types.Message, *args, **kwargs):
+        if message.from_user.id in ADMIN_IDS:
+            return await handler(message, *args, **kwargs)
+        else:
+            await message.reply("У вас нет прав для выполнения этой команды.")
+    return wrapper
+
+# Команда для экспорта таблиц
 # Команда для экспорта таблиц
 @dp.message_handler(commands=['export_tables'])
+@admin_only
 async def cmd_export_tables(message: types.Message):
     try:
         await export_tables_to_excel()
-        await message.reply("Таблицы успешно экспортированы в XLSX файлы.")
-        await bot.send_document(message.chat.id, open('users.xlsx', 'rb'))
-        await bot.send_document(message.chat.id, open('tasks.xlsx', 'rb'))
-        await bot.send_document(message.chat.id, open('task_statuses.xlsx', 'rb'))
+        files_to_send = ['users.xlsx', 'tasks.xlsx', 'task_statuses.xlsx']
+        
+        media = types.MediaGroup()
+        for file_path in files_to_send:
+            media.attach_document(types.InputFile(file_path))
+        
+        # Отправляем файлы одним сообщением
+        await bot.send_media_group(chat_id=message.chat.id, media=media)
+        
+        # Получаем текущую дату и время
+        current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Отправляем сообщение с датой и информацией
+        caption = (
+            f"📊 *Экспорт таблиц*\n"
+            f"`{current_datetime}`\n\n"
+            f"Таблицы успешно экспортированы в XLSX файлы."
+        )
+        await message.reply(caption, parse_mode='Markdown')
+        
+        # Удаляем созданные файлы после отправки
+        for file in files_to_send:
+            os.remove(file)
     except Exception as e:
         await message.reply(f"Произошла ошибка при экспорте таблиц: {str(e)}")
 
@@ -34,6 +63,8 @@ async def cmd_export_tables(message: types.Message):
 
 # Команда для получения статистики пользователей
 @dp.message_handler(commands=['stat'])
+@admin_only
+
 async def cmd_user_stats(message: types.Message):
     try:
 

@@ -13,13 +13,18 @@ async def export_tables_to_excel():
     print("Текущая рабочая директория:", os.getcwd())
     async for session in get_session():
         print("Сессия базы данных открыта")
-        # Удаляем блок try...except для отладки
+
         # Экспорт таблицы пользователей
         print("Экспорт таблицы пользователей...")
         users_result = await session.execute(select(User))
         users = users_result.scalars().all()
         print(f"Количество пользователей: {len(users)}")
-        users_data = [user.__dict__ for user in users]
+        users_data = []
+        for user in users:
+            # Преобразуем объект User в словарь, исключая служебные атрибуты
+            user_dict = user.__dict__.copy()
+            user_dict.pop('_sa_instance_state', None)  # Удаляем служебный атрибут
+            users_data.append(user_dict)
         users_df = pd.DataFrame(users_data)
         users_df.to_excel('users.xlsx', index=False)
         print("Файл users.xlsx сохранён")
@@ -29,7 +34,11 @@ async def export_tables_to_excel():
         tasks_result = await session.execute(select(Task))
         tasks = tasks_result.scalars().all()
         print(f"Количество задач: {len(tasks)}")
-        tasks_data = [task.__dict__ for task in tasks]
+        tasks_data = []
+        for task in tasks:
+            task_dict = task.__dict__.copy()
+            task_dict.pop('_sa_instance_state', None)
+            tasks_data.append(task_dict)
         tasks_df = pd.DataFrame(tasks_data)
         tasks_df.to_excel('tasks.xlsx', index=False)
         print("Файл tasks.xlsx сохранён")
@@ -39,7 +48,11 @@ async def export_tables_to_excel():
         statuses_result = await session.execute(select(TaskStatus))
         statuses = statuses_result.scalars().all()
         print(f"Количество статусов: {len(statuses)}")
-        statuses_data = [status.__dict__ for status in statuses]
+        statuses_data = []
+        for status in statuses:
+            status_dict = status.__dict__.copy()
+            status_dict.pop('_sa_instance_state', None)
+            statuses_data.append(status_dict)
         statuses_df = pd.DataFrame(statuses_data)
         statuses_df.to_excel('task_statuses.xlsx', index=False)
         print("Файл task_statuses.xlsx сохранён")
