@@ -142,69 +142,85 @@ async def get_wallet_statistics():
         )
         recent_transactions_count = recent_transactions.scalar()
 
-        # Количество депозитов
+        # Количество депозитов (только со статусом 'completed')
         deposit_transactions = await session.execute(
             select(func.count(WalletTransaction.id))
-            .where(WalletTransaction.transaction_type == 'deposit')
+            .where(
+                WalletTransaction.transaction_type == 'deposit',
+                WalletTransaction.status == 'completed'
+            )
         )
         deposit_transactions_count = deposit_transactions.scalar()
 
-        # Количество депозитов за последние сутки
+        # Количество депозитов за последние сутки (только со статусом 'completed')
         recent_deposit_transactions = await session.execute(
             select(func.count(WalletTransaction.id))
             .where(
                 WalletTransaction.transaction_type == 'deposit',
+                WalletTransaction.status == 'completed',
                 WalletTransaction.created_at >= one_day_ago
             )
         )
         recent_deposit_transactions_count = recent_deposit_transactions.scalar()
 
-        # Количество выводов
+        # Количество выводов (только со статусом 'completed')
         withdrawal_transactions = await session.execute(
             select(func.count(WalletTransaction.id))
-            .where(WalletTransaction.transaction_type == 'withdrawal')
+            .where(
+                WalletTransaction.transaction_type == 'withdrawal',
+                WalletTransaction.status == 'completed'
+            )
         )
         withdrawal_transactions_count = withdrawal_transactions.scalar()
 
-        # Количество выводов за последние сутки
+        # Количество выводов за последние сутки (только со статусом 'completed')
         recent_withdrawal_transactions = await session.execute(
             select(func.count(WalletTransaction.id))
             .where(
                 WalletTransaction.transaction_type == 'withdrawal',
+                WalletTransaction.status == 'completed',
                 WalletTransaction.created_at >= one_day_ago
             )
         )
         recent_withdrawal_transactions_count = recent_withdrawal_transactions.scalar()
 
-        # Общая сумма депозитов
+        # Общая сумма депозитов (только со статусом 'completed')
         total_amount_deposited = await session.execute(
             select(func.sum(WalletTransaction.amount))
-            .where(WalletTransaction.transaction_type == 'deposit')
+            .where(
+                WalletTransaction.transaction_type == 'deposit',
+                WalletTransaction.status == 'completed'
+            )
         )
         total_amount_deposited_value = total_amount_deposited.scalar() or 0
 
-        # Общая сумма депозитов за последние сутки
+        # Общая сумма депозитов за последние сутки (только со статусом 'completed')
         recent_total_amount_deposited = await session.execute(
             select(func.sum(WalletTransaction.amount))
             .where(
                 WalletTransaction.transaction_type == 'deposit',
+                WalletTransaction.status == 'completed',
                 WalletTransaction.created_at >= one_day_ago
             )
         )
         recent_total_amount_deposited_value = recent_total_amount_deposited.scalar() or 0
 
-        # Общая сумма выводов
+        # Общая сумма выводов (только со статусом 'completed')
         total_amount_withdrawn = await session.execute(
             select(func.sum(WalletTransaction.amount))
-            .where(WalletTransaction.transaction_type == 'withdrawal')
+            .where(
+                WalletTransaction.transaction_type == 'withdrawal',
+                WalletTransaction.status == 'completed'
+            )
         )
         total_amount_withdrawn_value = total_amount_withdrawn.scalar() or 0
 
-        # Общая сумма выводов за последние сутки
+        # Общая сумма выводов за последние сутки (только со статусом 'completed')
         recent_total_amount_withdrawn = await session.execute(
             select(func.sum(WalletTransaction.amount))
             .where(
                 WalletTransaction.transaction_type == 'withdrawal',
+                WalletTransaction.status == 'completed',
                 WalletTransaction.created_at >= one_day_ago
             )
         )

@@ -13,6 +13,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 API_TOKEN = '7379330461:AAFANy49VXwlHwhmZgt99_emw3YW1VZncIw'
+ADMIN_IDS = [7154683616, 1801021065]; 
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
