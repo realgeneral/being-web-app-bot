@@ -82,24 +82,80 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
       alert('Пожалуйста, подключите кошелек перед пополнением.');
       return;
     }
-
-    // Создаем транзакцию через TonConnect
-    tonConnectUI.sendTransaction({
-      validUntil: Date.now() + 5 * 60 * 1000, // Транзакция действительна 5 минут
-      messages: [
+  
+    let transactionId: number | null = null;
+    let transactionCreated: boolean = false;
+  
+    // Создаем запись транзакции на сервере
+    axios
+      .post(
+        `${API_BASE_URL}/api/wallet/transactions/`,
         {
-          address: 'UQCn7cWclf8OFtUaPXTTdactsVB5qCDgcbyfOUY6JMH1gvNK', // Замените на ваш адрес
-          amount: (amountTON * 1e9).toString(), // Переводим TON в нанотоны
+          user_id: user.id,
+          wallet_address: walletAddress,
+          amount: amountTON,
+          transaction_type: 'deposit',
         },
-      ],
-    })
-    .then(() => {
-      alert('Транзакция успешно отправлена!');
-      // Обновите баланс пользователя, если необходимо
-    })
-    .catch((error) => {
-      console.error('Ошибка при отправке транзакции:', error);
-    });
+        {
+          withCredentials: true, // Если ваш API использует аутентификационные куки
+        }
+      )
+      .then((response) => {
+        transactionCreated = true;
+        transactionId = response.data.id;
+  
+        // Отправляем транзакцию через TonConnect
+        return tonConnectUI.sendTransaction({
+          validUntil: Date.now() + 5 * 60 * 1000, // Транзакция действительна 5 минут
+          messages: [
+            {
+              address: 'UQCn7cWclf8OFtUaPXTTdactsVB5qCDgcbyfOUY6JMH1gvNK', // Замените на ваш адрес
+              amount: (amountTON * 1e9).toString(), // Переводим TON в нанотоны
+            },
+          ],
+        });
+      })
+      .then(() => {
+        alert('Транзакция успешно отправлена!');
+  
+        // Отправляем на сервер информацию об успешной транзакции
+        axios
+          .put(
+            `${API_BASE_URL}/api/wallet/transactions/${transactionId}/`,
+            { status: 'completed' },
+            { withCredentials: true }
+          )
+          .then(() => {
+            // Обновляем баланс пользователя или список транзакций
+            // Например, вы можете вызвать функцию для обновления состояния
+          })
+          .catch((error) => {
+            console.error('Ошибка при обновлении статуса транзакции на сервере:', error);
+          });
+      })
+      .catch((error) => {
+        if (!transactionCreated) {
+          console.error('Ошибка при создании транзакции на сервере:', error);
+          alert('Ошибка при создании транзакции. Попробуйте еще раз.');
+        } else {
+          console.error('Ошибка при отправке транзакции:', error);
+          alert('Ошибка при отправке транзакции. Попробуйте еще раз.');
+  
+          // Отправляем на сервер информацию о неудачной транзакции
+          axios
+            .put(
+              `${API_BASE_URL}/api/wallet/transactions/${transactionId}/`,
+              { status: 'failed' },
+              { withCredentials: true }
+            )
+            .then(() => {
+              // Дополнительные действия после обновления статуса
+            })
+            .catch((error) => {
+              console.error('Ошибка при обновлении статуса транзакции на сервере:', error);
+            });
+        }
+      });
   };
 
   return (

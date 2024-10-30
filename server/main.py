@@ -2,7 +2,7 @@
 from fastapi.routing import APIRoute
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from server.routers import logs, telegram, task, users, news
+from server.routers import logs, telegram, task, users, news, wallet_transactions
 from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
@@ -26,6 +26,8 @@ app.include_router(telegram, prefix="/api/auth", tags=["telegram"])
 app.include_router(task, prefix="/api/task", tags=["task"])
 app.include_router(users, prefix="/api/users", tags=["users"])
 app.include_router(news, prefix="/api/news", tags=["news"])
+app.include_router(wallet_transactions, prefix="/api/wallet", tags=["wallet"])
+
 # app.include_router(admin, prefix="/api/admin", tags=["admin"])
 
 
