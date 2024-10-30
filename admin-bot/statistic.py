@@ -58,7 +58,7 @@ async def export_tables_to_excel():
 async def get_user_statistics():
     async for session in get_session():
         # Общее количество пользователей
-        total_users = await session.execute(func.count(User.id))
+        total_users = await session.execute(select(func.count(User.id)))
         total_users_count = total_users.scalar()
 
         # Количество пользователей, присоединившихся за последние сутки
@@ -68,15 +68,43 @@ async def get_user_statistics():
         )
         recent_users_count = recent_users.scalar()
 
+        # Количество премиум пользователей
+        premium_users = await session.execute(
+            select(func.count(User.id)).where(User.is_premium == True)
+        )
+        premium_users_count = premium_users.scalar()
+
+        # Количество пользователей с языком 'RU'
+        ru_users = await session.execute(
+            select(func.count(User.id)).where(User.language_code == 'RU')
+        )
+        ru_users_count = ru_users.scalar()
+
+        # Количество пользователей с языком 'EN'
+        en_users = await session.execute(
+            select(func.count(User.id)).where(User.language_code == 'EN')
+        )
+        en_users_count = en_users.scalar()
+
+        # Количество пользователей, пришедших по реферальной ссылке
+        referral_users = await session.execute(
+            select(func.count(User.id)).where(User.referral_id != None)
+        )
+        referral_users_count = referral_users.scalar()
+
     return {
         'total_users': total_users_count,
-        'recent_users': recent_users_count
+        'recent_users': recent_users_count,
+        'premium_users': premium_users_count,
+        'ru_users': ru_users_count,
+        'en_users': en_users_count,
+        'referral_users': referral_users_count
     }
 
 async def get_task_statistics():
     async for session in get_session():
         # Общее количество задач
-        total_tasks = await session.execute(func.count(Task.id))
+        total_tasks = await session.execute(select(func.count(Task.id)))
         total_tasks_count = total_tasks.scalar()
 
         # Количество задач по статусам
@@ -86,11 +114,23 @@ async def get_task_statistics():
             .group_by(TaskStatus.status)
         )
         status_counts_result = status_counts.all()
+        task_statuses = {status: count for status, count in status_counts_result}
 
-    task_statuses = {status: count for status, count in status_counts_result}
+        # Количество задач типа 'Bot' (id=1)
+        tasks_type1 = await session.execute(
+            select(func.count(Task.id)).where(Task.task_type_id == 1)
+        )
+        tasks_type1_count = tasks_type1.scalar()
+
+        # Количество задач типа 'Subscribe to Channel' (id=2)
+        tasks_type2 = await session.execute(
+            select(func.count(Task.id)).where(Task.task_type_id == 2)
+        )
+        tasks_type2_count = tasks_type2.scalar()
 
     return {
         'total_tasks': total_tasks_count,
-        'task_statuses': task_statuses
+        'task_statuses': task_statuses,
+        'tasks_type1': tasks_type1_count,
+        'tasks_type2': tasks_type2_count
     }
-

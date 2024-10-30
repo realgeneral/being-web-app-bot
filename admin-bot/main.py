@@ -42,7 +42,11 @@ async def cmd_user_stats(message: types.Message):
         response += (
             f"🔸 _Пользователи_\n"
             f"  Общее количество пользователей: {stats_user['total_users']}\n"
-            f"  Присоединилось за последние сутки: {stats_user['recent_users']}\n\n"
+            f"  Присоединилось за последние сутки: {stats_user['recent_users']}\n"
+            f"  Премиум пользователей: {stats_user['premium_users']}\n"
+            f"  Пользователей с языком 'RU': {stats_user['ru_users']}\n"
+            f"  Пользователей с языком 'EN': {stats_user['en_users']}\n"
+            f"  Пользователей по реферальной ссылке: {stats_user['referral_users']}\n\n"
         )
         
         response += f"🔸 _Задачи_ \n"
@@ -50,9 +54,14 @@ async def cmd_user_stats(message: types.Message):
 
         for status, count in stats_task['task_statuses'].items():
             response += f"  Количество задач со статусом '{status}': {count}\n"
+
+        response += (
+            f"  Задач типа 'Bot': {stats_task['tasks_type1']}\n"
+            f"  Задач типа 'Subscribe to Channel': {stats_task['tasks_type2']}\n\n"
+        )
         
         
-        response += f"\n🔸 _Выплаты_ \n"
+        response += f"\n🔸 _Пополнения_ \n"
 
         response += f"\n*=======================================*\n"
             
