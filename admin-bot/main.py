@@ -18,19 +18,15 @@ ADMIN_IDS = [7154683616, 1801021065];
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
-def admin_only(handler):
-    async def wrapper(message: types.Message, *args, **kwargs):
-        if message.from_user.id in ADMIN_IDS:
-            return await handler(message, *args, **kwargs)
-        else:
-            await message.reply("У вас нет прав для выполнения этой команды.")
-    return wrapper
 
 # Команда для экспорта таблиц
-# Команда для экспорта таблиц
 @dp.message_handler(commands=['export_tables'])
-@admin_only
 async def cmd_export_tables(message: types.Message):
+        # Проверяем, является ли пользователь администратором
+    if message.from_user.id not in ADMIN_IDS:
+        await message.reply("У вас нет прав для выполнения этой команды.")
+        return
+    
     try:
         await export_tables_to_excel()
         files_to_send = ['users.xlsx', 'tasks.xlsx', 'task_statuses.xlsx']
@@ -63,9 +59,12 @@ async def cmd_export_tables(message: types.Message):
 
 # Команда для получения статистики пользователей
 @dp.message_handler(commands=['stat'])
-@admin_only
-
 async def cmd_user_stats(message: types.Message):
+        # Проверяем, является ли пользователь администратором
+    if message.from_user.id not in ADMIN_IDS:
+        await message.reply("У вас нет прав для выполнения этой команды.")
+        return
+    
     try:
 
         stats_user = await get_user_statistics()
