@@ -1,11 +1,3 @@
-import pandas as pd
-import asyncio
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from datetime import datetime, timedelta
-from sqlalchemy import func
-from server.models import User, Task, TaskStatus
-from server.database import get_session
 
 import pandas as pd
 import asyncio
@@ -14,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from datetime import datetime, timedelta
 from sqlalchemy import func
-from server.models import User, Task, TaskStatus
+from server.models import User, Task, TaskStatus, WalletTransaction
 from server.database import get_session
 
 async def export_tables_to_excel():
@@ -133,4 +125,119 @@ async def get_task_statistics():
         'task_statuses': task_statuses,
         'tasks_type1': tasks_type1_count,
         'tasks_type2': tasks_type2_count
+    }
+
+async def get_wallet_statistics():
+    async for session in get_session():
+        one_day_ago = datetime.utcnow() - timedelta(days=1)
+
+        # Общее количество транзакций
+        total_transactions = await session.execute(select(func.count(WalletTransaction.id)))
+        total_transactions_count = total_transactions.scalar()
+
+        # Количество транзакций за последние сутки
+        recent_transactions = await session.execute(
+            select(func.count(WalletTransaction.id))
+            .where(WalletTransaction.created_at >= one_day_ago)
+        )
+        recent_transactions_count = recent_transactions.scalar()
+
+        # Количество депозитов
+        deposit_transactions = await session.execute(
+            select(func.count(WalletTransaction.id))
+            .where(WalletTransaction.transaction_type == 'deposit')
+        )
+        deposit_transactions_count = deposit_transactions.scalar()
+
+        # Количество депозитов за последние сутки
+        recent_deposit_transactions = await session.execute(
+            select(func.count(WalletTransaction.id))
+            .where(
+                WalletTransaction.transaction_type == 'deposit',
+                WalletTransaction.created_at >= one_day_ago
+            )
+        )
+        recent_deposit_transactions_count = recent_deposit_transactions.scalar()
+
+        # Количество выводов
+        withdrawal_transactions = await session.execute(
+            select(func.count(WalletTransaction.id))
+            .where(WalletTransaction.transaction_type == 'withdrawal')
+        )
+        withdrawal_transactions_count = withdrawal_transactions.scalar()
+
+        # Количество выводов за последние сутки
+        recent_withdrawal_transactions = await session.execute(
+            select(func.count(WalletTransaction.id))
+            .where(
+                WalletTransaction.transaction_type == 'withdrawal',
+                WalletTransaction.created_at >= one_day_ago
+            )
+        )
+        recent_withdrawal_transactions_count = recent_withdrawal_transactions.scalar()
+
+        # Общая сумма депозитов
+        total_amount_deposited = await session.execute(
+            select(func.sum(WalletTransaction.amount))
+            .where(WalletTransaction.transaction_type == 'deposit')
+        )
+        total_amount_deposited_value = total_amount_deposited.scalar() or 0
+
+        # Общая сумма депозитов за последние сутки
+        recent_total_amount_deposited = await session.execute(
+            select(func.sum(WalletTransaction.amount))
+            .where(
+                WalletTransaction.transaction_type == 'deposit',
+                WalletTransaction.created_at >= one_day_ago
+            )
+        )
+        recent_total_amount_deposited_value = recent_total_amount_deposited.scalar() or 0
+
+        # Общая сумма выводов
+        total_amount_withdrawn = await session.execute(
+            select(func.sum(WalletTransaction.amount))
+            .where(WalletTransaction.transaction_type == 'withdrawal')
+        )
+        total_amount_withdrawn_value = total_amount_withdrawn.scalar() or 0
+
+        # Общая сумма выводов за последние сутки
+        recent_total_amount_withdrawn = await session.execute(
+            select(func.sum(WalletTransaction.amount))
+            .where(
+                WalletTransaction.transaction_type == 'withdrawal',
+                WalletTransaction.created_at >= one_day_ago
+            )
+        )
+        recent_total_amount_withdrawn_value = recent_total_amount_withdrawn.scalar() or 0
+
+        # Количество транзакций по статусам
+        status_counts = await session.execute(
+            select(WalletTransaction.status, func.count(WalletTransaction.id))
+            .group_by(WalletTransaction.status)
+        )
+        status_counts_result = status_counts.all()
+        transaction_statuses = {status: count for status, count in status_counts_result}
+
+        # Количество транзакций по статусам за последние сутки
+        recent_status_counts = await session.execute(
+            select(WalletTransaction.status, func.count(WalletTransaction.id))
+            .where(WalletTransaction.created_at >= one_day_ago)
+            .group_by(WalletTransaction.status)
+        )
+        recent_status_counts_result = recent_status_counts.all()
+        recent_transaction_statuses = {status: count for status, count in recent_status_counts_result}
+
+    return {
+        'total_transactions': total_transactions_count,
+        'recent_transactions': recent_transactions_count,
+        'deposit_transactions': deposit_transactions_count,
+        'recent_deposit_transactions': recent_deposit_transactions_count,
+        'withdrawal_transactions': withdrawal_transactions_count,
+        'recent_withdrawal_transactions': recent_withdrawal_transactions_count,
+        'total_amount_deposited': total_amount_deposited_value,
+        'recent_total_amount_deposited': recent_total_amount_deposited_value,
+        'total_amount_withdrawn': total_amount_withdrawn_value,
+        'recent_total_amount_withdrawn': recent_total_amount_withdrawn_value,
+        'transaction_statuses': transaction_statuses,
+        'recent_transaction_statuses': recent_transaction_statuses
     }

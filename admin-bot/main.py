@@ -5,7 +5,8 @@ import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 
-from .statistic import export_tables_to_excel, get_user_statistics, get_task_statistics
+from .statistic import export_tables_to_excel, get_user_statistics, get_task_statistics, get_wallet_statistics
+
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -36,6 +37,7 @@ async def cmd_user_stats(message: types.Message):
 
         stats_user = await get_user_statistics()
         stats_task = await get_task_statistics()
+        stats_wallet = await get_wallet_statistics()
 
         response = f"*============== СТАТИСТИКА =================*\n\n"
 
@@ -61,7 +63,22 @@ async def cmd_user_stats(message: types.Message):
         )
         
         
-        response += f"\n🔸 _Пополнения_ \n"
+        response += f"🔸 _Пополнения_ \n"
+        response += f"  Общее количество транзакций: {stats_wallet['total_transactions']}\n"
+        response += f"  Транзакций за последние сутки: {stats_wallet['recent_transactions']}\n"
+        response += f"  Количество депозитов: {stats_wallet['deposit_transactions']}\n"
+        response += f"  Депозитов за последние сутки: {stats_wallet['recent_deposit_transactions']}\n"
+        response += f"  Общая сумма депозитов: {stats_wallet['total_amount_deposited']}\n"
+        response += f"  Сумма депозитов за последние сутки: {stats_wallet['recent_total_amount_deposited']}\n"
+
+
+        response += "  Транзакции по статусам:\n"
+        for status, count in stats_wallet['transaction_statuses'].items():
+            response += f"    '{status}': {count}\n"
+
+        response += "  Транзакции по статусам за последние сутки:\n"
+        for status, count in stats_wallet['recent_transaction_statuses'].items():
+            response += f"    '{status}': {count}\n"
 
         response += f"\n*=======================================*\n"
             
