@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import logo from '../assets/logo.png'; // Убедитесь, что логотип размещен корректно
 import axios from 'axios';
+import Linkify from 'react-linkify';
 
 // Интерфейс для свойств, принимаемых компонентом Home
 interface HomeProps {
@@ -217,11 +218,13 @@ const Home: React.FC<HomeProps> = ({ user }) => {
       </div>
 
       {/* Модальное окно для отображения деталей новости */}
-      {/* {isModalOpen && selectedNewsItem && (
+      {isModalOpen && selectedNewsItem && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-gray-900 p-6 rounded-lg w-11/12 max-w-lg">
             <h2 className="text-xl font-bold mb-4">{selectedNewsItem.title}</h2>
-            <p className="text-sm text-gray-300 mb-4">{selectedNewsItem.content}</p>
+            <Linkify>
+              <p className="text-sm text-gray-300 mb-4">{selectedNewsItem.content}</p>
+            </Linkify>
             <button
               onClick={closeModal}
               className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
@@ -230,7 +233,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
             </button>
           </div>
         </div>
-      )} */}
+      )}
 
       {/* Модальное окно для создания новости */}
       {isCreateModalOpen && (
