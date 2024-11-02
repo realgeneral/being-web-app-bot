@@ -111,6 +111,22 @@ const Home: React.FC<HomeProps> = ({ user }) => {
     setIsCreateModalOpen(false);
   };
 
+  const linkComponentDecorator = (
+    decoratedHref: string,
+    decoratedText: string,
+    key: number
+  ) => (
+    <a
+      href={decoratedHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      key={key}
+      className="text-blue-500 hover:underline"
+    >
+      {decoratedText}
+    </a>
+  );
+
   // Функция для обработки создания новой новости
   const handleCreateNews = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -216,24 +232,26 @@ const Home: React.FC<HomeProps> = ({ user }) => {
           </div>
         </section>
       </div>
-
+      
       {/* Модальное окно для отображения деталей новости */}
       {isModalOpen && selectedNewsItem && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-gray-900 p-6 rounded-lg w-11/12 max-w-lg">
-            <h2 className="text-xl font-bold mb-4">{selectedNewsItem.title}</h2>
-            <Linkify>
-              <p className="text-sm text-gray-300 mb-4">{selectedNewsItem.content}</p>
-            </Linkify>
-            <button
-              onClick={closeModal}
-              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="bg-gray-900 p-6 rounded-lg w-11/12 max-w-lg">
+                  <h2 className="text-xl font-bold mb-4">{selectedNewsItem.title}</h2>
+                  <Linkify componentDecorator={linkComponentDecorator}>
+                    <p className="text-sm text-gray-300 mb-4">
+                      {selectedNewsItem.content}
+                    </p>
+                  </Linkify>
+                  <button
+                    onClick={closeModal}
+                    className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
 
       {/* Модальное окно для создания новости */}
       {isCreateModalOpen && (
