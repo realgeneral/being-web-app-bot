@@ -38,6 +38,18 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
 
   const API_BASE_URL = 'https://nollab.ru:8000';
 
+    // Добавляем эффект для автоматического переключения темы
+    useEffect(() => {
+      if (
+        window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches
+      ) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }, []);
+
   // Функция для загрузки активных задач пользователя
   const fetchActiveTasks = async () => {
     try {
@@ -168,26 +180,26 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
   return (
     <div className="flex flex-col flex-1 w-full h-full">
       {/* Заголовок страницы */}
-      <header className="flex-none h-10 w-full flex justify-between items-center px-4 bg-black border-b border-gray-700">
-        <h1 className="text-2xl font-bold">
+      <header className="flex-none h-10 w-full flex justify-between items-center px-4 bg-white dark:bg-black border-b border-gray-300 dark:border-gray-700">
+        <h1 className="text-2xl font-bold text-black dark:text-white">
           {isArchivedView ? 'My archive tasks' : 'My active tasks'}
         </h1>
       </header>
 
       {/* Основное содержимое */}
-      <div className="flex-1 flex flex-col ">
+      <div className="flex-1 flex flex-col">
         <div className="flex justify-center mt-4 gap-4 w-full">
           {!isArchivedView && (
             <button
-              className="bg-gray-800 border border-white px-4 py-2 rounded hover:bg-yellow-500 transition"
+              className="bg-gray-200 dark:bg-gray-800 border border-black dark:border-white px-4 py-2 rounded hover:bg-yellow-500 transition text-black dark:text-white"
               onClick={() => setShowForm(true)}
             >
               Create new task
             </button>
           )}
           <button
-            className="bg-gray-800 border border-white px-4 py-2 rounded hover:bg-yellow-500 transition"
-            onClick={() => setIsArchivedView(!isArchivedView)} // Переключаем вид между архивными и активными задачами
+            className="bg-gray-200 dark:bg-gray-800 border border-black dark:border-white px-4 py-2 rounded hover:bg-yellow-500 transition text-black dark:text-white"
+            onClick={() => setIsArchivedView(!isArchivedView)}
           >
             {isArchivedView ? 'My active tasks' : 'My archive tasks'}
           </button>
@@ -197,11 +209,11 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
         {showForm && !isArchivedView && (
           <form
             onSubmit={handleSubmit}
-            className="mt-6 w-full max-w-md bg-gray-800 p-5 rounded"
+            className="mt-6 w-full max-w-md bg-gray-100 dark:bg-gray-800 p-5 rounded"
           >
             <div className="mb-4">
               <label
-                className="block text-white text-sm font-bold mb-2"
+                className="block text-black dark:text-white text-sm font-bold mb-2"
                 htmlFor="task_type_id"
               >
                 Type
@@ -211,16 +223,16 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
                 id="task_type_id"
                 value={formData.task_type_id}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-white bg-black rounded"
+                className="w-full px-3 py-2 bg-white dark:bg-black text-black dark:text-white rounded"
                 required
               >
                 <option value={1}>Bot</option>
-                <option value={2}>Chanel</option>
+                <option value={2}>Channel</option>
               </select>
             </div>
             <div className="mb-4">
               <label
-                className="block text-white text-sm font-bold mb-2"
+                className="block text-black dark:text-white text-sm font-bold mb-2"
                 htmlFor="name"
               >
                 Task name
@@ -231,13 +243,13 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
                 id="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-white"
+                className="w-full px-3 py-2 bg-white dark:bg-black text-black dark:text-white rounded"
                 required
               />
             </div>
             <div className="mb-4">
               <label
-                className="block text-white text-sm font-bold mb-2"
+                className="block text-black dark:text-white text-sm font-bold mb-2"
                 htmlFor="link"
               >
                 Link (starting with https://t.me/...)
@@ -248,13 +260,13 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
                 id="link"
                 value={formData.link}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-white"
+                className="w-full px-3 py-2 bg-white dark:bg-black text-black dark:text-white rounded"
                 required
               />
             </div>
             <div className="mb-4">
               <label
-                className="block text-white text-sm font-bold mb-2"
+                className="block text-black dark:text-white text-sm font-bold mb-2"
                 htmlFor="total_clicks"
               >
                 Total clicks
@@ -265,14 +277,14 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
                 id="total_clicks"
                 value={formData.total_clicks}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-white"
+                className="w-full px-3 py-2 bg-white dark:bg-black text-black dark:text-white rounded"
                 min="1"
                 required
               />
             </div>
             <div className="mb-4">
               <label
-                className="block text-white text-sm font-bold mb-2"
+                className="block text-black dark:text-white text-sm font-bold mb-2"
                 htmlFor="reward_per_click"
               >
                 Points per click
@@ -283,7 +295,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
                 id="reward_per_click"
                 value={formData.reward_per_click}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-white"
+                className="w-full px-3 py-2 bg-white dark:bg-black text-black dark:text-white rounded"
                 min="1"
                 required
               />
@@ -297,7 +309,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
               </button>
               <button
                 type="button"
-                className="text-white underline"
+                className="text-black dark:text-white underline"
                 onClick={() => setShowForm(false)}
               >
                 Cancel
@@ -306,24 +318,24 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
           </form>
         )}
 
-        {/* Список активных или архивных задач */}
+        {/* Список задач */}
         <div className="w-full max-w-4xl mt-6">
           {tasks.length === 0 ? (
-            <p className="text-center text-white">
-             You dont have any {isArchivedView ? 'archive' : 'actve'} tasks
+            <p className="text-center text-black dark:text-white">
+              You don't have any {isArchivedView ? 'archive' : 'active'} tasks
             </p>
           ) : (
             <div className="space-y-4 px-5">
               {tasks.map((task) => (
                 <div
                   key={task.id}
-                  className="bg-gray-800 p-5 rounded flex items-center justify-between h-20"
+                  className="bg-gray-100 dark:bg-gray-800 p-5 rounded flex items-center justify-between h-20"
                 >
                   <div className="flex items-center space-x-3">
                     <FaTelegramPlane className="text-blue-500 text-base" />
-                    <div className="text-sm">
+                    <div className="text-sm text-black dark:text-white">
                       <h3 className="font-semibold">{task.name}</h3>
-                      <p className="text-gray-400">
+                      <p className="text-gray-600 dark:text-gray-400">
                         {task.reward_per_click} Points per click
                       </p>
                       <a

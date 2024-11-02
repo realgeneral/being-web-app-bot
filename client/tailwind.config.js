@@ -13,6 +13,7 @@ module.exports = {
       },
     },
   },
+  darkMode: 'class', // или 'media' для автоматического определения темы
   variants: {
     extend: {},
   },
