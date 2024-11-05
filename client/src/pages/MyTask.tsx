@@ -159,8 +159,8 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
     } catch (error: any) {
       console.error('Ошибка при создании задания:', error);
       setErrorMessage(
-        'Ошибка при создании задания: ' +
-          (error.response?.data?.detail || 'Неизвестная ошибка')
+        'ERROR: ' +
+          (error.response?.data?.detail || ' ')
       );
       setIsAlertVisible(true); // Показать алерт при ошибке
       setTimeout(() => {
@@ -191,10 +191,10 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
         <div className="fixed top-5 right-5 z-50 bg-yellow-500 text-black font-semibold py-3 px-6 rounded shadow-lg border border-black">
           <p>{errorMessage}</p>
           <button
-            className="mt-2 text-sm text-gray-800 underline"
+            className="mt-2 text-sm text-yellow-800 underline"
             onClick={() => setIsAlertVisible(false)}
           >
-            Закрыть
+            Close
           </button>
         </div>
       )}
@@ -297,7 +297,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
                 value={formData.total_clicks}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 bg-white dark:bg-black text-black dark:text-white rounded"
-                min="1"
+                min="10"
                 required
               />
             </div>
@@ -315,7 +315,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
                 value={formData.reward_per_click}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 bg-white dark:bg-black text-black dark:text-white rounded"
-                min="1"
+                min="10"
                 required
               />
             </div>

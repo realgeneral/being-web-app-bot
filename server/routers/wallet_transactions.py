@@ -75,8 +75,14 @@ async def update_wallet_transaction(
             result = await session.execute(select(User).where(User.id == transaction.user_id))
             user = result.scalar_one_or_none()
             if user:
-                # Обновляем баланс пользователя (предполагаем, что 1 TON = 100 points)
-                user.points += int(transaction.amount * 100)
+                points = 0
+                if (transaction.amount == 3):
+                    points = 1500
+                elif (transaction.amount == 10):
+                    points = 5000
+                elif (transaction.amount == 50):
+                    points = 25000
+                user.points += int(points)
                 session.add(user)
 
         session.add(transaction)
