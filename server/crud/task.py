@@ -167,22 +167,35 @@ async def finish_task_in_db(db: AsyncSession, task_id: int, telegram_id: int):
         )
         task = result.scalar_one_or_none()
 
-        # Если задача не найдена или не принадлежит текущему пользователю
         if not task:
             raise ValueError(f"Task with id {task_id} not found for user {telegram_id}")
 
-        # Если задача уже завершена
         if task.status_id == 3:
             raise ValueError(f"Task {task_id} is already completed")
 
-        # Обновляем статус задачи на stopped (status_id = 3)
+        # Вычисляем и возвращаем неиспользованные поинты
+        unused_points = task.reserved_points - (task.completed_clicks * task.reward_per_click)
+        
+        # Обновляем баланс пользователя, добавляя неиспользованные поинты
+        result_user = await db.execute(select(User).where(User.telegram_id == telegram_id))
+        user = result_user.scalar_one_or_none()
+        
+        if user:
+            user.points += unused_points
+            db.add(user)
+        
+        # Обновляем статус задачи на "завершенную" (например, status_id = 3)
         task.status_id = 3
+        db.add(task)
+        
+        # Сохраняем изменения
         await db.commit()
-        await db.refresh(task)  # Обновляем экземпляр задачи после коммита
+        await db.refresh(task)
+        await db.refresh(user)
 
         return task
 
     except Exception as e:
-        logging.error
+        logging.error(f"Error finishing task {task_id} for user {telegram_id}: {e}")
         await db.rollback()
-        raise e
+        raise
