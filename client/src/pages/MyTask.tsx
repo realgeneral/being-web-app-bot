@@ -35,6 +35,8 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
     status_id: 1, // Добавил поле status_id
   });
   const [isArchivedView, setIsArchivedView] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // Состояние для хранения текста ошибки
+  const [isAlertVisible, setIsAlertVisible] = useState<boolean>(false); // Состояние для видимости алерта
 
   const API_BASE_URL = 'https://nollab.ru:8000';
 
@@ -152,13 +154,18 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
       );
       console.log('Задание создано:', response.data);
       setShowForm(false);
-      fetchActiveTasks(); // Обновляем список задач после создания нового
+      setErrorMessage(null);
+      fetchActiveTasks();
     } catch (error: any) {
       console.error('Ошибка при создании задания:', error);
-      alert(
+      setErrorMessage(
         'Ошибка при создании задания: ' +
           (error.response?.data?.detail || 'Неизвестная ошибка')
       );
+      setIsAlertVisible(true); // Показать алерт при ошибке
+      setTimeout(() => {
+        setIsAlertVisible(false); // Скрыть алерт через 5 секунд
+      }, 5000);
     }
   };
 
@@ -178,7 +185,19 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
   };
 
   return (
-    <div className="flex flex-col flex-1 w-full h-full">
+    <div className="flex flex-col flex-1 w-full h-full relative">
+      {/* Алерт-уведомление */}
+      {isAlertVisible && errorMessage && (
+        <div className="fixed top-5 right-5 z-50 bg-yellow-500 text-black font-semibold py-3 px-6 rounded shadow-lg border border-black">
+          <p>{errorMessage}</p>
+          <button
+            className="mt-2 text-sm text-gray-800 underline"
+            onClick={() => setIsAlertVisible(false)}
+          >
+            Закрыть
+          </button>
+        </div>
+      )}
       {/* Заголовок страницы */}
       <header className="flex-none h-10 w-full flex justify-between items-center px-4 bg-white dark:bg-black border-b border-gray-300 dark:border-gray-700">
         <h1 className="text-2xl font-bold text-black dark:text-white">
@@ -226,8 +245,8 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
                 className="w-full px-3 py-2 bg-white dark:bg-black text-black dark:text-white rounded"
                 required
               >
-                <option value={1}>Bot</option>
-                <option value={2}>Channel</option>
+                <option value={1}>BOT (Affiliate Link)</option>
+                <option value={2}>CHANNEL (Subscribe and react)</option>
               </select>
             </div>
             <div className="mb-4">
