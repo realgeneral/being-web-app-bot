@@ -309,7 +309,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
               </button>
               <button
                 type="button"
-                className="dark:border-white  dark:bg-gray-800 text-black dark:text-white"
+                className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded"
                 onClick={() => setShowForm(false)}
               >
                 Cancel
