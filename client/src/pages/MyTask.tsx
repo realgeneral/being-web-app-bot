@@ -182,7 +182,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
       {/* Заголовок страницы */}
       <header className="flex-none h-10 w-full flex justify-between items-center px-4 bg-white dark:bg-black border-b border-gray-300 dark:border-gray-700">
         <h1 className="text-2xl font-bold text-black dark:text-white">
-          {isArchivedView ? 'My archive tasks' : 'My active tasks'}
+          {isArchivedView ? 'MY ARCHIVE TASKS' : 'MY ACTIVE TASKS'}
         </h1>
       </header>
 
@@ -309,7 +309,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
               </button>
               <button
                 type="button"
-                className="text-black dark:text-white underline"
+                className="text-black dark:border-white dark:text-white dark:bg-gray-800"
                 onClick={() => setShowForm(false)}
               >
                 Cancel

@@ -188,7 +188,7 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
     <div className="flex flex-col flex-1 w-full h-full">
       {/* Заголовок страницы */}
       <header className="flex-none h-10 w-full flex justify-between items-center px-6 bg-black border-b border-gray-700">
-        <h1 className="text-2xl font-bold">My Wallet</h1>
+        <h1 className="text-2xl font-bold">MY WALLET</h1>
         <span className="text-sm">@{user.username}</span>
       </header>
       <div className="flex justify-center my-8">
