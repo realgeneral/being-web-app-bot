@@ -1,7 +1,6 @@
-// Layout.tsx
-
-import React, { ReactNode } from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { ReactNode, useEffect, useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 interface LayoutProps {
   children: ReactNode;
@@ -9,8 +8,29 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, user }) => {
-  const ADMIN_IDS = [7154683616]; // Замените на реальные ID администраторов
+  const [points, setPoints] = useState(user.points); // Локальное состояние для количества поинтов
+  const location = useLocation(); // Хук для отслеживания изменений маршрута
+  const ADMIN_IDS = [7154683616];
   const isAdmin = ADMIN_IDS.includes(user.telegram_id);
+
+  // Функция для получения актуального количества поинтов пользователя
+  const fetchUserPoints = async () => {
+    try {
+      const response = await axios.get(`/api/users/${user.id}`, {
+        headers: {
+          'X-Telegram-ID': user.telegram_id.toString(),
+        },
+      });
+      setPoints(response.data.points);
+    } catch (error) {
+      console.error('Error fetching user points:', error);
+    }
+  };
+
+  // Обновление данных при каждом изменении маршрута
+  useEffect(() => {
+    fetchUserPoints();
+  }, [location.pathname]); // Срабатывает при изменении пути
 
   return (
     <div className="relative h-screen bg-black text-white">
@@ -18,7 +38,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user }) => {
       <header className="fixed top-0 left-0 right-0 h-16 flex justify-between items-center px-4 bg-black z-10">
         <div className="text-2xl font-bold text-yellow-500">BEING BOT</div>
         <div className="flex items-center bg-gray-800 p-3 rounded-md shadow-md space-x-2">
-          <span className="text-sm font-bold text-yellow-500">{user.points}</span>
+          <span className="text-sm font-bold text-yellow-500">{points}</span>
           <span className="text-sm text-gray-300">Points</span>
         </div>
       </header>
