@@ -170,7 +170,8 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
   };
 
   const formatLink = (link: string) => {
-    return link.replace('https://t.me/', '@');
+    const formattedLink = link.replace('https://t.me/', '@');
+    return formattedLink.slice(0, 5); // Обрезает строку до первых 5 символов
   };
 
   const getStatusLabel = (status_id: number) => {
