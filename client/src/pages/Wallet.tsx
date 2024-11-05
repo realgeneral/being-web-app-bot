@@ -190,7 +190,7 @@ const Wallet: React.FC<WalletProps> = ({ user }) => {
         <div className="fixed top-5 right-5 z-50 bg-yellow-500 text-black font-semibold py-3 px-6 rounded shadow-lg border border-black">
           <p>{errorMessage}</p>
           <button
-            className="mt-2 text-sm text-gray-800 underline"
+            className="mt-2 text-sm text-black-800 "
             onClick={() => setIsAlertVisible(false)}
           >
             Close

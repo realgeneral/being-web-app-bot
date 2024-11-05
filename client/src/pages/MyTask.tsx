@@ -11,6 +11,8 @@ interface MyTaskProps {
     last_name: string;
     points: number;
   };
+  updatePoints: () => void; // Передаем функцию обновления
+
 }
 
 interface Task {
@@ -89,13 +91,9 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
   };
 
   // Функция для завершения задачи
-  const handleFinishTask = async (taskId: number) => {
-    const isConfirmed = window.confirm(
-      'Вы уверены, что хотите завершить это задание?'
-    );
-    if (!isConfirmed) return;
-
-    try {
+  const MyTask: React.FC<MyTaskProps> = ({ user, updatePoints }) => {
+    const handleFinishTask = async (taskId: number) => {
+      try {
       const response = await axios.post(
         `${API_BASE_URL}/api/task/finish_task`,
         { task_id: taskId },
@@ -106,6 +104,7 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
         }
       );
       console.log('Задание успешно завершено:', response.data);
+      updatePoints();
       fetchActiveTasks(); // Обновляем список задач
     } catch (error) {
       console.error('Ошибка при завершении задания:', error);
