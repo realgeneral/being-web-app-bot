@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
+
 import { FaTelegramPlane } from 'react-icons/fa'; // Иконка Телеграмма
 
 interface MyTaskProps {
@@ -25,9 +27,11 @@ interface Task {
   status_id: number;
 }
 
-const MyTask: React.FC<MyTaskProps> = ({ user }) => {
+const MyTask: React.FC<MyTaskProps> = ({ user, updatePoints }) => {
   const [showForm, setShowForm] = useState<boolean>(false);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const location = useLocation(); // Хук для отслеживания текущего пути
+
   const [formData, setFormData] = useState({
     task_type_id: 1,
     name: '',
@@ -41,6 +45,14 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
   const [isAlertVisible, setIsAlertVisible] = useState<boolean>(false); // Состояние для видимости алерта
 
   const API_BASE_URL = 'https://nollab.ru:8000';
+
+  // Вызов функции обновления баланса при переходе на эту страницу
+  useEffect(() => {
+    // Проверяем, что пользователь находится на этой странице
+    if (location.pathname === '/mytask') {
+      updatePoints(); // Выполняем проверку баланса при входе на страницу
+    }
+  }, [location.pathname, updatePoints]); // Перезапускаем эффект при изменении пути
 
     // Добавляем эффект для автоматического переключения темы
     useEffect(() => {
@@ -91,9 +103,13 @@ const MyTask: React.FC<MyTaskProps> = ({ user }) => {
   };
 
   // Функция для завершения задачи
-  const MyTask: React.FC<MyTaskProps> = ({ user, updatePoints }) => {
-    const handleFinishTask = async (taskId: number) => {
-      try {
+  const handleFinishTask = async (taskId: number) => {
+    const isConfirmed = window.confirm(
+      'Вы уверены, что хотите завершить это задание?'
+    );
+    if (!isConfirmed) return;
+
+    try {
       const response = await axios.post(
         `${API_BASE_URL}/api/task/finish_task`,
         { task_id: taskId },
